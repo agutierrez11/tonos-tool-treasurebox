@@ -2,13 +2,13 @@ import { useState } from "react";
 import { LucideIcon } from "lucide-react";
 import {
   Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation
+  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
 } from "lucide-react";
 import { categories } from "@/data/tools";
 
 const iconMap: Record<string, LucideIcon> = {
   Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation
+  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
 };
 
 const CategoryNav = () => {
