@@ -1,12 +1,14 @@
 import { LucideIcon } from "lucide-react";
 import {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder
+  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
+  Flame, Shield, Target, Presentation
 } from "lucide-react";
 import { tools } from "@/data/tools";
 import ToolCard from "./ToolCard";
 
 const iconMap: Record<string, LucideIcon> = {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder
+  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
+  Flame, Shield, Target, Presentation
 };
 
 interface CategorySectionProps {

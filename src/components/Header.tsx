@@ -46,12 +46,12 @@ const Header = () => {
           style={{ animationDelay: '300ms' }}
         >
           <div className="text-center">
-            <div className="font-display text-3xl font-bold text-gradient-primary">30+</div>
+            <div className="font-display text-3xl font-bold text-gradient-primary">60+</div>
             <div className="text-sm text-muted-foreground">Herramientas</div>
           </div>
           <div className="w-px h-10 bg-border hidden sm:block" />
           <div className="text-center">
-            <div className="font-display text-3xl font-bold text-gradient-primary">8</div>
+            <div className="font-display text-3xl font-bold text-gradient-primary">12</div>
             <div className="text-sm text-muted-foreground">Categorías</div>
           </div>
           <div className="w-px h-10 bg-border hidden sm:block" />

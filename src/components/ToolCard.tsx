@@ -3,7 +3,10 @@ import {
   Mail, CheckCircle, Inbox, Shield, CheckSquare, Send, Target, TestTube, Rocket,
   Edit3, Sparkles, Wand2, ShoppingBag, GraduationCap, Copy, RefreshCw, FileSearch,
   Shuffle, Type, Hash, Mic, PenLine, TrendingUp, Layers, Server, Key, Brain, Wand,
-  User, UserPlus, LineChart, Link
+  User, UserPlus, LineChart, Link, Search, Flame, ThermometerSun, Zap, MessageSquare,
+  BookOpen, ScanSearch, Languages, RotateCw, Calculator, Wrench, ShoppingCart, GitCompare,
+  MessageCircle, Paintbrush, Database, AtSign, Phone, MapPin, Bot, Moon, Settings,
+  Linkedin, Combine, Users, Layout, Presentation, FileText, AlertTriangle
 } from "lucide-react";
 import type { Tool } from "@/data/tools";
 
@@ -11,7 +14,16 @@ const iconMap: Record<string, LucideIcon> = {
   Mail, CheckCircle, Inbox, Shield, CheckSquare, Send, Target, TestTube, Rocket,
   Edit3, Sparkles, Wand2, ShoppingBag, GraduationCap, Copy, RefreshCw, FileSearch,
   Shuffle, Type, Hash, Mic, PenLine, TrendingUp, Layers, Server, Key, Brain, Wand,
-  User, UserPlus, LineChart, Link
+  User, UserPlus, LineChart, Link, Search, Flame, ThermometerSun, Zap, MessageSquare,
+  BookOpen, ScanSearch, Languages, RotateCw, Calculator, Wrench, ShoppingCart, GitCompare,
+  MessageCircle, Paintbrush, Database, AtSign, Phone, MapPin, Bot, Moon, Settings,
+  Linkedin, Combine, Users, Layout, Presentation, FileText, AlertTriangle
+};
+
+// Fallback for icons not in lucide
+const getIcon = (iconName: string): LucideIcon => {
+  if (iconName === "Atom") return Sparkles;
+  return iconMap[iconName] || Link;
 };
 
 interface ToolCardProps {
@@ -20,7 +32,7 @@ interface ToolCardProps {
 }
 
 const ToolCard = ({ tool, index }: ToolCardProps) => {
-  const IconComponent = iconMap[tool.icon] || Link;
+  const IconComponent = getIcon(tool.icon);
 
   return (
     <a
