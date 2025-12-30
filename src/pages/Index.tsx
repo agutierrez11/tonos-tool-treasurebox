@@ -13,8 +13,8 @@ const Index = () => {
       <Header />
       <CategoryNav />
       
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        <div className="space-y-16">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10 md:py-12">
+        <div className="space-y-10 sm:space-y-12 md:space-y-16">
           {categories.map((category, index) => (
             <CategorySection 
               key={category.id} 

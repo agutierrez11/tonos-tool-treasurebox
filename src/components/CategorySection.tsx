@@ -30,28 +30,28 @@ const CategorySection = ({ category, index }: CategorySectionProps) => {
   return (
     <section
       id={category.id}
-      className="scroll-mt-24 animate-fade-in"
+      className="scroll-mt-16 sm:scroll-mt-20 md:scroll-mt-24 animate-fade-in"
       style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Category Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div
-          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg`}
+          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg flex-shrink-0`}
         >
-          <IconComponent className="w-6 h-6 text-white" />
+          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
         </div>
         <div>
-          <h2 className="font-display text-2xl font-bold text-foreground">
+          <h2 className="font-display text-xl sm:text-2xl font-bold text-foreground">
             {category.name}
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {categoryTools.length} herramienta{categoryTools.length !== 1 ? "s" : ""}
           </p>
         </div>
       </div>
 
       {/* Tools Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
         {categoryTools.map((tool, toolIndex) => (
           <ToolCard key={tool.id} tool={tool} index={toolIndex} />
         ))}
