@@ -46,7 +46,7 @@ const Header = () => {
           style={{ animationDelay: '300ms' }}
         >
           <div className="text-center">
-            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">130+</div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">95+</div>
             <div className="text-xs sm:text-sm text-muted-foreground">Herramientas</div>
           </div>
           <div className="w-px h-8 sm:h-10 bg-border hidden sm:block" />
