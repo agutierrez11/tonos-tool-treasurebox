@@ -1,30 +1,27 @@
 import { useState } from "react";
 import { LucideIcon, ChevronDown } from "lucide-react";
 import {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
+  Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
+  GraduationCap, Zap, Folder
 } from "lucide-react";
-import { tools } from "@/data/tools";
+import { getToolsByCategory, type Category } from "@/data/tools";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ToolCard from "./ToolCard";
 
 const iconMap: Record<string, LucideIcon> = {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
+  Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
+  GraduationCap, Zap, Folder
 };
 
 interface CategorySectionProps {
-  category: {
-    id: string;
-    name: string;
-    icon: string;
-    color: string;
-  };
+  category: Category;
   index: number;
 }
 
 const CategorySection = ({ category, index }: CategorySectionProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const categoryTools = tools.filter((tool) => tool.category === category.id);
+  const { language, t } = useLanguage();
+  const categoryTools = getToolsByCategory(category.id);
   const IconComponent = iconMap[category.icon] || Folder;
 
   if (categoryTools.length === 0) return null;
@@ -44,14 +41,14 @@ const CategorySection = ({ category, index }: CategorySectionProps) => {
           <div
             className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform`}
           >
-            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
           </div>
           <div className="text-left">
             <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">
-              {category.name}
+              {category.name[language]}
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground">
-              {categoryTools.length} herramienta{categoryTools.length !== 1 ? "s" : ""}
+              {categoryTools.length} {language === "es" ? "herramientas" : "tools"}
             </p>
           </div>
         </div>

@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { LucideIcon } from "lucide-react";
 import {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
+  Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
+  GraduationCap, Zap, Folder
 } from "lucide-react";
 import { categories } from "@/data/tools";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const iconMap: Record<string, LucideIcon> = {
-  Mail, PenTool, BarChart3, Zap, FileText, Search, Image, Users, Folder,
-  Flame, Shield, Target, Presentation, Video, BookOpen, Building2, FileSpreadsheet
+  Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
+  GraduationCap, Zap, Folder
 };
 
 const CategoryNav = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { language } = useLanguage();
 
   const scrollToCategory = (categoryId: string) => {
     setActiveCategory(categoryId);
@@ -43,7 +45,7 @@ const CategoryNav = () => {
                 `}
               >
                 <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="text-xs sm:text-sm font-medium">{category.name}</span>
+                <span className="text-xs sm:text-sm font-medium">{category.name[language]}</span>
               </button>
             );
           })}

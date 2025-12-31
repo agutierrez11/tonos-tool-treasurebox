@@ -1,8 +1,18 @@
 import { Wrench, Sparkles } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import LanguageToggle from "./LanguageToggle";
+import { tools, categories } from "@/data/tools";
 
 const Header = () => {
+  const { t } = useLanguage();
+
   return (
-    <header className="relative pt-12 sm:pt-16 md:pt-20 pb-10 sm:pb-12 md:pb-16 px-4 overflow-hidden">
+    <header className="relative pt-8 sm:pt-12 md:pt-16 pb-8 sm:pb-10 md:pb-12 px-4 overflow-hidden">
+      {/* Language Toggle */}
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageToggle />
+      </div>
+
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-1/4 w-48 sm:w-72 md:w-96 h-48 sm:h-72 md:h-96 bg-primary/5 rounded-full blur-3xl animate-pulse-slow" />
@@ -15,7 +25,7 @@ const Header = () => {
         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-effect mb-6 sm:mb-8 animate-fade-in">
           <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
           <span className="text-xs sm:text-sm font-medium text-muted-foreground">
-            Colección curada de herramientas digitales
+            {t.header.badge}
           </span>
         </div>
 
@@ -24,9 +34,9 @@ const Header = () => {
           className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in-up"
           style={{ animationDelay: '100ms' }}
         >
-          <span className="text-foreground">Herramientas</span>
+          <span className="text-foreground">{t.header.title1}</span>
           <br />
-          <span className="text-gradient-primary">Digitales</span>
+          <span className="text-gradient-primary">{t.header.title2}</span>
         </h1>
 
         {/* Subtitle */}
@@ -34,10 +44,7 @@ const Header = () => {
           className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed animate-fade-in px-2"
           style={{ animationDelay: '200ms' }}
         >
-          Una colección organizada de las mejores herramientas para 
-          <span className="text-primary"> marketing</span>,
-          <span className="text-accent"> productividad</span> y
-          <span className="text-primary"> automatización</span>
+          {t.header.subtitle}
         </p>
 
         {/* Stats */}
@@ -46,18 +53,18 @@ const Header = () => {
           style={{ animationDelay: '300ms' }}
         >
           <div className="text-center">
-            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">95+</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Herramientas</div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">{tools.length}+</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.tools}</div>
           </div>
           <div className="w-px h-8 sm:h-10 bg-border hidden sm:block" />
           <div className="text-center">
-            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">16</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Categorías</div>
+            <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">{categories.length}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.categories}</div>
           </div>
           <div className="w-px h-8 sm:h-10 bg-border hidden sm:block" />
           <div className="text-center">
             <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">100%</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">Gratuito</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.free}</div>
           </div>
         </div>
 
