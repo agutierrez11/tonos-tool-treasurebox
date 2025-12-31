@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Phone, PhoneCall, MessageSquare, Calendar, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import { Phone, PhoneCall, MessageSquare, Calendar, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, Lightbulb, Wrench, BookOpen, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -430,6 +430,144 @@ const CallFunnelCalculator = () => {
                         <li>• {language === "es" ? "Identifica el dolor rápidamente" : "Identify pain quickly"}</li>
                         <li>• {language === "es" ? "Ofrece valor inmediato" : "Offer immediate value"}</li>
                         <li>• {language === "es" ? "Propón fecha concreta" : "Propose specific date"}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Herramientas Recomendadas */}
+              <AccordionItem value="tools" className="border-t border-border">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="font-semibold flex items-center gap-2">
+                    <Wrench className="w-4 h-4" />
+                    {language === "es" ? "Herramientas Recomendadas" : "Recommended Tools"}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-4">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                    <a href="https://www.aircall.io/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">Aircall</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "Sistema telefónico cloud con analytics de llamadas" : "Cloud phone system with call analytics"}
+                      </p>
+                    </a>
+                    <a href="https://www.dialpad.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">Dialpad</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "AI para coaching en tiempo real durante llamadas" : "AI for real-time coaching during calls"}
+                      </p>
+                    </a>
+                    <a href="https://www.gong.io/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">Gong.io</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "Inteligencia de conversaciones y análisis de ventas" : "Conversation intelligence and sales analytics"}
+                      </p>
+                    </a>
+                    <a href="https://www.salesloft.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">SalesLoft</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "Cadencias de llamadas automatizadas" : "Automated call cadences"}
+                      </p>
+                    </a>
+                    <a href="https://www.outreach.io/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">Outreach</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "Plataforma de engagement de ventas" : "Sales engagement platform"}
+                      </p>
+                    </a>
+                    <a href="https://calendly.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-semibold">Calendly</h5>
+                        <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-muted-foreground text-xs">
+                        {language === "es" ? "Agenda reuniones sin fricción" : "Schedule meetings without friction"}
+                      </p>
+                    </a>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Recursos Educativos */}
+              <AccordionItem value="resources" className="border-t border-border">
+                <AccordionTrigger className="px-4 hover:no-underline">
+                  <span className="font-semibold flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    {language === "es" ? "Recursos para Mejorar" : "Resources to Improve"}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-4">
+                  <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-3">
+                      <h5 className="font-semibold text-primary flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4" />
+                        {language === "es" ? "Libros Recomendados" : "Recommended Books"}
+                      </h5>
+                      <ul className="space-y-2 text-muted-foreground">
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          <span><strong>Fanatical Prospecting</strong> - Jeb Blount</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          <span><strong>Smart Calling</strong> - Art Sobczak</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          <span><strong>Never Split the Difference</strong> - Chris Voss</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="space-y-3">
+                      <h5 className="font-semibold text-primary flex items-center gap-2">
+                        <ExternalLink className="w-4 h-4" />
+                        {language === "es" ? "Cursos y Materiales" : "Courses and Materials"}
+                      </h5>
+                      <ul className="space-y-2">
+                        <li>
+                          <a href="https://www.jbarrows.com/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                            <span className="text-primary">•</span>
+                            <span>JBarrows Sales Training</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.sandler.com/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                            <span className="text-primary">•</span>
+                            <span>Sandler Training</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://learn.hubspot.com/courses/inbound-sales" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                            <span className="text-primary">•</span>
+                            <span>HubSpot Inbound Sales (Gratis)</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
+                        <li>
+                          <a href="https://www.youtube.com/@salesinsightslab" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                            <span className="text-primary">•</span>
+                            <span>Sales Insights Lab (YouTube)</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </li>
                       </ul>
                     </div>
                   </div>
