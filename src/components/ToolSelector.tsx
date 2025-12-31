@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, ExternalLink, X } from "lucide-react";
+import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, ExternalLink, X, Check, DollarSign, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getFilteredTools, type Need, type Level, type Tool } from "@/data/tools";
+import { getFilteredTools, type Need, type Level, type Tool, type Pricing } from "@/data/tools";
 
 const ToolSelector = () => {
   const { language } = useLanguage();
-  const [selectedNeed, setSelectedNeed] = useState<Need | null>(null);
+  const [selectedNeeds, setSelectedNeeds] = useState<Need[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
   const needs = [
@@ -58,7 +58,11 @@ const ToolSelector = () => {
   ];
 
   const handleNeedClick = (need: Need) => {
-    setSelectedNeed(selectedNeed === need ? null : need);
+    setSelectedNeeds(prev => 
+      prev.includes(need) 
+        ? prev.filter(n => n !== need)
+        : [...prev, need]
+    );
   };
 
   const handleLevelClick = (level: Level) => {
@@ -66,12 +70,12 @@ const ToolSelector = () => {
   };
 
   const clearFilters = () => {
-    setSelectedNeed(null);
+    setSelectedNeeds([]);
     setSelectedLevel(null);
   };
 
-  const filteredTools = getFilteredTools(selectedNeed, selectedLevel);
-  const hasSelection = selectedNeed || selectedLevel;
+  const filteredTools = getFilteredTools(selectedNeeds, selectedLevel);
+  const hasSelection = selectedNeeds.length > 0 || selectedLevel;
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8">
@@ -91,15 +95,15 @@ const ToolSelector = () => {
         </p>
       </div>
 
-      {/* Needs Section */}
+      {/* Needs Section - Multi-select */}
       <div className="space-y-3">
         <h3 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider text-center">
-          {language === "es" ? "¿Qué necesitas?" : "What do you need?"}
+          {language === "es" ? "¿Qué necesitas? (puedes elegir varias)" : "What do you need? (select multiple)"}
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {needs.map((need) => {
             const Icon = need.icon;
-            const isSelected = selectedNeed === need.id;
+            const isSelected = selectedNeeds.includes(need.id);
             return (
               <button
                 key={need.id}
@@ -112,6 +116,11 @@ const ToolSelector = () => {
                     : "bg-card/50 border-border/50 hover:border-primary/50 hover:bg-card"
                 )}
               >
+                {isSelected && (
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                    <Check className="w-3 h-3 text-primary-foreground" />
+                  </div>
+                )}
                 <div
                   className={cn(
                     "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors",
@@ -191,17 +200,24 @@ const ToolSelector = () => {
       {hasSelection && (
         <div className="space-y-4 animate-fade-in">
           {/* Summary Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-border/30">
+          <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-border/30">
             <p className="text-xs sm:text-sm text-muted-foreground">
               {language === "es" ? "Mostrando" : "Showing"}
               <span className="font-semibold text-foreground mx-1">{filteredTools.length}</span>
               {language === "es" ? "herramientas para:" : "tools for:"}
-              {selectedNeed && (
-                <span className="ml-1 font-medium text-primary">
-                  {needs.find(n => n.id === selectedNeed)?.label[language]}
+              {selectedNeeds.length > 0 && (
+                <span className="ml-1">
+                  {selectedNeeds.map((needId, idx) => (
+                    <span key={needId}>
+                      <span className="font-medium text-primary">
+                        {needs.find(n => n.id === needId)?.label[language]}
+                      </span>
+                      {idx < selectedNeeds.length - 1 && <span className="mx-1">+</span>}
+                    </span>
+                  ))}
                 </span>
               )}
-              {selectedNeed && selectedLevel && <span className="mx-1">+</span>}
+              {selectedNeeds.length > 0 && selectedLevel && <span className="mx-1">•</span>}
               {selectedLevel && (
                 <span className="font-medium text-accent">
                   {levels.find(l => l.id === selectedLevel)?.label[language]}
@@ -210,11 +226,27 @@ const ToolSelector = () => {
             </p>
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
             >
               <X className="w-3 h-3" />
               {language === "es" ? "Limpiar" : "Clear"}
             </button>
+          </div>
+
+          {/* Pricing Legend */}
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="text-muted-foreground">{language === "es" ? "Gratis" : "Free"}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span className="text-muted-foreground">Freemium</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+              <span className="text-muted-foreground">{language === "es" ? "Paga" : "Paid"}</span>
+            </div>
           </div>
 
           {/* Results Grid */}
@@ -246,21 +278,52 @@ interface ToolResultCardProps {
   language: "es" | "en";
 }
 
+const pricingConfig: Record<Pricing, { color: string; label: { es: string; en: string }; icon: typeof DollarSign }> = {
+  free: { 
+    color: "bg-emerald-500", 
+    label: { es: "Gratis", en: "Free" },
+    icon: Gift
+  },
+  freemium: { 
+    color: "bg-amber-500", 
+    label: { es: "Freemium", en: "Freemium" },
+    icon: Gift
+  },
+  paid: { 
+    color: "bg-rose-500", 
+    label: { es: "Paga", en: "Paid" },
+    icon: DollarSign
+  },
+};
+
 const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
+  const pricing = pricingConfig[tool.pricing];
+  
   return (
     <a
       href={tool.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
+      className="group relative flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
       style={{ animationDelay: `${index * 30}ms` }}
     >
+      {/* Pricing Badge */}
+      <div 
+        className={cn(
+          "absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white",
+          pricing.color
+        )}
+        title={pricing.label[language]}
+      >
+        {pricing.label[language]}
+      </div>
+
       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
         <span className="text-lg font-bold text-primary">
           {tool.name.charAt(0)}
         </span>
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 pr-14">
         <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
           {tool.name}
         </h4>
@@ -268,7 +331,7 @@ const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
           {tool.description[language]}
         </p>
       </div>
-      <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+      <ExternalLink className="absolute bottom-3 right-3 w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
     </a>
   );
 };
