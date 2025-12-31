@@ -3,12 +3,20 @@ import Header from "@/components/Header";
 import CategoryNav from "@/components/CategoryNav";
 import CategorySection from "@/components/CategorySection";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { language } = useLanguage();
+
   return (
     <div className="min-h-screen">
       {/* SEO Meta */}
-      <title>Herramientas Digitales | Colección Curada para Marketing y Productividad</title>
+      <title>
+        {language === "es" 
+          ? "Herramientas Digitales | Colección Curada para Marketing y Productividad"
+          : "Digital Tools | Curated Collection for Marketing and Productivity"
+        }
+      </title>
       
       <Header />
       <CategoryNav />

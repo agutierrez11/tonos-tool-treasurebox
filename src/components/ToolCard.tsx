@@ -1,28 +1,29 @@
 import { ExternalLink, LucideIcon } from "lucide-react";
 import {
-  Mail, CheckCircle, Inbox, Shield, CheckSquare, Send, Target, TestTube, Rocket,
-  Edit3, Sparkles, Wand2, ShoppingBag, GraduationCap, Copy, RefreshCw, FileSearch,
-  Shuffle, Type, Hash, Mic, PenLine, TrendingUp, Layers, Server, Key, Brain, Wand,
-  User, UserPlus, LineChart, Link, Search, Flame, ThermometerSun, Zap, MessageSquare,
-  BookOpen, ScanSearch, Languages, RotateCw, Calculator, Wrench, ShoppingCart, GitCompare,
-  MessageCircle, Paintbrush, Database, AtSign, Phone, MapPin, Bot, Moon, Settings,
-  Linkedin, Combine, Users, Layout, Presentation, FileText, AlertTriangle
+  Mail, MailCheck, MailOpen, MailSearch, Send, Flame, FolderCheck, Thermometer, ListChecks,
+  ShieldCheck, CheckCircle, Wrench, Shuffle, RefreshCw, FileText, Lightbulb, Languages,
+  Bot, Wand2, Ghost, GraduationCap, FileEdit, PenLine, FileDown, RotateCw, ScanSearch,
+  Mic, Hash, Search, TrendingUp, Eye, Globe, Layers, Code, FileSearch, Linkedin, Heart,
+  BarChart, Handshake, Target, RefreshCcw, PlayCircle, MessageSquare, Brain, BookOpen,
+  Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
+  UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
+  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link
 } from "lucide-react";
 import type { Tool } from "@/data/tools";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const iconMap: Record<string, LucideIcon> = {
-  Mail, CheckCircle, Inbox, Shield, CheckSquare, Send, Target, TestTube, Rocket,
-  Edit3, Sparkles, Wand2, ShoppingBag, GraduationCap, Copy, RefreshCw, FileSearch,
-  Shuffle, Type, Hash, Mic, PenLine, TrendingUp, Layers, Server, Key, Brain, Wand,
-  User, UserPlus, LineChart, Link, Search, Flame, ThermometerSun, Zap, MessageSquare,
-  BookOpen, ScanSearch, Languages, RotateCw, Calculator, Wrench, ShoppingCart, GitCompare,
-  MessageCircle, Paintbrush, Database, AtSign, Phone, MapPin, Bot, Moon, Settings,
-  Linkedin, Combine, Users, Layout, Presentation, FileText, AlertTriangle
+  Mail, MailCheck, MailOpen, MailSearch, Send, Flame, FolderCheck, Thermometer, ListChecks,
+  ShieldCheck, CheckCircle, Wrench, Shuffle, RefreshCw, FileText, Lightbulb, Languages,
+  Bot, Wand2, Ghost, GraduationCap, FileEdit, PenLine, FileDown, RotateCw, ScanSearch,
+  Mic, Hash, Search, TrendingUp, Eye, Globe, Layers, Code, FileSearch, Linkedin, Heart,
+  BarChart, Handshake, Target, RefreshCcw, PlayCircle, MessageSquare, Brain, BookOpen,
+  Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
+  UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
+  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link
 };
 
-// Fallback for icons not in lucide
 const getIcon = (iconName: string): LucideIcon => {
-  if (iconName === "Atom") return Sparkles;
   return iconMap[iconName] || Link;
 };
 
@@ -33,6 +34,7 @@ interface ToolCardProps {
 
 const ToolCard = ({ tool, index }: ToolCardProps) => {
   const IconComponent = getIcon(tool.icon);
+  const { language } = useLanguage();
 
   return (
     <a
@@ -62,7 +64,7 @@ const ToolCard = ({ tool, index }: ToolCardProps) => {
 
           {/* Description */}
           <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-3">
-            {tool.description}
+            {tool.description[language]}
           </p>
 
           {/* URL Preview */}
