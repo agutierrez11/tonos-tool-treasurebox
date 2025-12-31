@@ -5,6 +5,7 @@ import CategorySection from "@/components/CategorySection";
 import Footer from "@/components/Footer";
 import SalesCalculator from "@/components/SalesCalculator";
 import CallFunnelCalculator from "@/components/CallFunnelCalculator";
+import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -28,6 +29,9 @@ const Index = () => {
       
       {/* Call Funnel Calculator */}
       <CallFunnelCalculator />
+      
+      {/* Email Funnel Calculator */}
+      <EmailFunnelCalculator />
       
       {/* Prospect Funnel Calculator */}
       <ProspectFunnelCalculator />
