@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Target, TrendingUp, Users, Zap, GraduationCap, Briefcase, Award } from "lucide-react";
+import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, ExternalLink, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getFilteredTools, type Need, type Level, type Tool } from "@/data/tools";
 
-type Need = "prospecting" | "automation" | "analytics" | "content";
-type Level = "beginner" | "junior" | "senior";
-
-interface ToolSelectorProps {
-  onSelectionChange?: (need: Need | null, level: Level | null) => void;
-}
-
-const ToolSelector = ({ onSelectionChange }: ToolSelectorProps) => {
+const ToolSelector = () => {
   const { language } = useLanguage();
   const [selectedNeed, setSelectedNeed] = useState<Need | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
@@ -36,7 +30,7 @@ const ToolSelector = ({ onSelectionChange }: ToolSelectorProps) => {
     },
     {
       id: "content" as Need,
-      icon: Users,
+      icon: FileText,
       label: { es: "Contenido", en: "Content" },
       description: { es: "Crea contenido persuasivo", en: "Create persuasive content" },
     },
@@ -64,19 +58,23 @@ const ToolSelector = ({ onSelectionChange }: ToolSelectorProps) => {
   ];
 
   const handleNeedClick = (need: Need) => {
-    const newNeed = selectedNeed === need ? null : need;
-    setSelectedNeed(newNeed);
-    onSelectionChange?.(newNeed, selectedLevel);
+    setSelectedNeed(selectedNeed === need ? null : need);
   };
 
   const handleLevelClick = (level: Level) => {
-    const newLevel = selectedLevel === level ? null : level;
-    setSelectedLevel(newLevel);
-    onSelectionChange?.(selectedNeed, newLevel);
+    setSelectedLevel(selectedLevel === level ? null : level);
   };
 
+  const clearFilters = () => {
+    setSelectedNeed(null);
+    setSelectedLevel(null);
+  };
+
+  const filteredTools = getFilteredTools(selectedNeed, selectedLevel);
+  const hasSelection = selectedNeed || selectedLevel;
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 sm:space-y-8">
+    <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8">
       {/* Section Title */}
       <div className="text-center">
         <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-2">
@@ -189,26 +187,89 @@ const ToolSelector = ({ onSelectionChange }: ToolSelectorProps) => {
         </div>
       </div>
 
-      {/* Selection Summary */}
-      {(selectedNeed || selectedLevel) && (
-        <div className="text-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-border/30">
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {language === "es" ? "Mostrando herramientas para:" : "Showing tools for:"}
-            {selectedNeed && (
-              <span className="ml-1 font-medium text-primary">
-                {needs.find(n => n.id === selectedNeed)?.label[language]}
-              </span>
-            )}
-            {selectedNeed && selectedLevel && <span className="mx-1">•</span>}
-            {selectedLevel && (
-              <span className="font-medium text-accent">
-                {levels.find(l => l.id === selectedLevel)?.label[language]}
-              </span>
-            )}
-          </p>
+      {/* Selection Summary & Results */}
+      {hasSelection && (
+        <div className="space-y-4 animate-fade-in">
+          {/* Summary Header */}
+          <div className="flex items-center justify-between p-3 sm:p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-border/30">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {language === "es" ? "Mostrando" : "Showing"}
+              <span className="font-semibold text-foreground mx-1">{filteredTools.length}</span>
+              {language === "es" ? "herramientas para:" : "tools for:"}
+              {selectedNeed && (
+                <span className="ml-1 font-medium text-primary">
+                  {needs.find(n => n.id === selectedNeed)?.label[language]}
+                </span>
+              )}
+              {selectedNeed && selectedLevel && <span className="mx-1">+</span>}
+              {selectedLevel && (
+                <span className="font-medium text-accent">
+                  {levels.find(l => l.id === selectedLevel)?.label[language]}
+                </span>
+              )}
+            </p>
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="w-3 h-3" />
+              {language === "es" ? "Limpiar" : "Clear"}
+            </button>
+          </div>
+
+          {/* Results Grid */}
+          {filteredTools.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {filteredTools.map((tool, index) => (
+                <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
+              ))}
+            </div>
+          )}
+
+          {filteredTools.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              {language === "es" 
+                ? "No hay herramientas que coincidan con esta combinación"
+                : "No tools match this combination"
+              }
+            </div>
+          )}
         </div>
       )}
     </div>
+  );
+};
+
+interface ToolResultCardProps {
+  tool: Tool;
+  index: number;
+  language: "es" | "en";
+}
+
+const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
+  return (
+    <a
+      href={tool.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
+      style={{ animationDelay: `${index * 30}ms` }}
+    >
+      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+        <span className="text-lg font-bold text-primary">
+          {tool.name.charAt(0)}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+          {tool.name}
+        </h4>
+        <p className="text-xs text-muted-foreground truncate">
+          {tool.description[language]}
+        </p>
+      </div>
+      <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+    </a>
   );
 };
 
