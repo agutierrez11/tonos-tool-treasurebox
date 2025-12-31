@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { BarChart3, TrendingUp, TrendingDown, AlertTriangle, CheckCircle } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface AnalysisResult {
   score: number;
@@ -18,138 +19,140 @@ interface AnalysisResult {
 
 const DataAnalyzerDemo = () => {
   const { language } = useLanguage();
+  const { toast } = useToast();
   const [leads, setLeads] = useState("100");
   const [calls, setCalls] = useState("50");
   const [meetings, setMeetings] = useState("15");
   const [closes, setCloses] = useState("5");
-  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
 
-  const analyze = () => {
+  const analyze = async () => {
     setIsAnalyzing(true);
+    setAiAnalysis("");
     setResult(null);
 
-    setTimeout(() => {
-      const leadsNum = parseInt(leads) || 0;
-      const callsNum = parseInt(calls) || 0;
-      const meetingsNum = parseInt(meetings) || 0;
-      const closesNum = parseInt(closes) || 0;
+    const leadsNum = parseInt(leads) || 0;
+    const callsNum = parseInt(calls) || 0;
+    const meetingsNum = parseInt(meetings) || 0;
+    const closesNum = parseInt(closes) || 0;
 
-      const contactRate = leadsNum > 0 ? (callsNum / leadsNum) * 100 : 0;
-      const meetingRate = callsNum > 0 ? (meetingsNum / callsNum) * 100 : 0;
-      const closeRate = meetingsNum > 0 ? (closesNum / meetingsNum) * 100 : 0;
-      const overallRate = leadsNum > 0 ? (closesNum / leadsNum) * 100 : 0;
+    const contactRate = leadsNum > 0 ? (callsNum / leadsNum) * 100 : 0;
+    const meetingRate = callsNum > 0 ? (meetingsNum / callsNum) * 100 : 0;
+    const closeRate = meetingsNum > 0 ? (closesNum / meetingsNum) * 100 : 0;
 
-      const insights: AnalysisResult["insights"] = [];
-      const recommendations: string[] = [];
+    const prompt = language === "es"
+      ? `Analiza estos datos de embudo de ventas y proporciona un análisis detallado con recomendaciones específicas:
 
-      // Contact rate analysis
-      if (contactRate >= 50) {
-        insights.push({
-          type: "positive",
-          text: language === "es"
-            ? `Excelente tasa de contacto: ${contactRate.toFixed(1)}%`
-            : `Excellent contact rate: ${contactRate.toFixed(1)}%`,
-        });
-      } else if (contactRate >= 30) {
-        insights.push({
-          type: "warning",
-          text: language === "es"
-            ? `Tasa de contacto mejorable: ${contactRate.toFixed(1)}%`
-            : `Contact rate could improve: ${contactRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Mejora la calidad de tu lista de leads usando herramientas como Apollo.io o ZoomInfo"
-            : "Improve lead list quality using tools like Apollo.io or ZoomInfo"
-        );
-      } else {
-        insights.push({
-          type: "negative",
-          text: language === "es"
-            ? `Tasa de contacto baja: ${contactRate.toFixed(1)}%`
-            : `Low contact rate: ${contactRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Revisa tu segmentación y considera usar un servicio de verificación de datos"
-            : "Review your segmentation and consider using a data verification service"
-        );
+Métricas:
+- Leads totales: ${leadsNum}
+- Llamadas realizadas: ${callsNum} (Tasa de contacto: ${contactRate.toFixed(1)}%)
+- Reuniones agendadas: ${meetingsNum} (Tasa de conversión a reuniones: ${meetingRate.toFixed(1)}%)
+- Ventas cerradas: ${closesNum} (Tasa de cierre: ${closeRate.toFixed(1)}%)
+
+Benchmarks de referencia B2B:
+- Tasa de contacto objetivo: 40-60%
+- Tasa de reuniones desde llamadas: 20-35%
+- Tasa de cierre desde reuniones: 25-40%
+
+Proporciona:
+1. Diagnóstico del embudo (qué etapas están bien, cuáles necesitan mejora)
+2. Las 3 acciones prioritarias para mejorar resultados
+3. Herramientas específicas que podrían ayudar en cada etapa débil`
+      : `Analyze this sales funnel data and provide a detailed analysis with specific recommendations:
+
+Metrics:
+- Total leads: ${leadsNum}
+- Calls made: ${callsNum} (Contact rate: ${contactRate.toFixed(1)}%)
+- Meetings booked: ${meetingsNum} (Meeting conversion rate: ${meetingRate.toFixed(1)}%)
+- Deals closed: ${closesNum} (Close rate: ${closeRate.toFixed(1)}%)
+
+B2B Reference Benchmarks:
+- Target contact rate: 40-60%
+- Meetings from calls rate: 20-35%
+- Close rate from meetings: 25-40%
+
+Provide:
+1. Funnel diagnosis (which stages are good, which need improvement)
+2. Top 3 priority actions to improve results
+3. Specific tools that could help at each weak stage`;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: prompt }],
+            type: "analyzer",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error en la respuesta");
       }
 
-      // Meeting rate analysis
-      if (meetingRate >= 30) {
-        insights.push({
-          type: "positive",
-          text: language === "es"
-            ? `Gran conversión a reuniones: ${meetingRate.toFixed(1)}%`
-            : `Great meeting conversion: ${meetingRate.toFixed(1)}%`,
-        });
-      } else if (meetingRate >= 15) {
-        insights.push({
-          type: "warning",
-          text: language === "es"
-            ? `Conversión a reuniones promedio: ${meetingRate.toFixed(1)}%`
-            : `Average meeting conversion: ${meetingRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Trabaja en tu pitch inicial - prueba diferentes enfoques de valor"
-            : "Work on your initial pitch - test different value approaches"
-        );
-      } else {
-        insights.push({
-          type: "negative",
-          text: language === "es"
-            ? `Baja conversión a reuniones: ${meetingRate.toFixed(1)}%`
-            : `Low meeting conversion: ${meetingRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Revisa tu propuesta de valor y practica técnicas de manejo de objeciones"
-            : "Review your value proposition and practice objection handling techniques"
-        );
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No reader available");
+
+      const decoder = new TextDecoder();
+      let content = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr) {
+                const parsed = JSON.parse(jsonStr);
+                const delta = parsed.choices?.[0]?.delta?.content;
+                if (delta) {
+                  content += delta;
+                  setAiAnalysis(content);
+                }
+              }
+            } catch {
+              // Skip invalid JSON
+            }
+          }
+        }
       }
 
-      // Close rate analysis
-      if (closeRate >= 33) {
-        insights.push({
-          type: "positive",
-          text: language === "es"
-            ? `Excelente tasa de cierre: ${closeRate.toFixed(1)}%`
-            : `Excellent close rate: ${closeRate.toFixed(1)}%`,
-        });
-      } else if (closeRate >= 20) {
-        insights.push({
-          type: "warning",
-          text: language === "es"
-            ? `Tasa de cierre promedio: ${closeRate.toFixed(1)}%`
-            : `Average close rate: ${closeRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Implementa un proceso de seguimiento más estructurado con un CRM"
-            : "Implement a more structured follow-up process with a CRM"
-        );
-      } else {
-        insights.push({
-          type: "negative",
-          text: language === "es"
-            ? `Tasa de cierre baja: ${closeRate.toFixed(1)}%`
-            : `Low close rate: ${closeRate.toFixed(1)}%`,
-        });
-        recommendations.push(
-          language === "es"
-            ? "Califica mejor tus leads antes de las reuniones y trabaja en técnicas de cierre"
-            : "Better qualify your leads before meetings and work on closing techniques"
-        );
-      }
+      // Calculate score based on metrics
+      const score = Math.min(100, Math.round(
+        (Math.min(contactRate / 50, 1) * 20) +
+        (Math.min(meetingRate / 25, 1) * 30) +
+        (Math.min(closeRate / 30, 1) * 50)
+      ));
 
-      const score = Math.min(100, Math.round((contactRate * 0.2 + meetingRate * 0.3 + closeRate * 0.5)));
-
-      setResult({ score, insights, recommendations });
+      setResult({
+        score,
+        insights: [],
+        recommendations: [],
+      });
+    } catch (error) {
+      console.error("Analysis error:", error);
+      toast({
+        variant: "destructive",
+        title: language === "es" ? "Error" : "Error",
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 1500);
+    }
   };
 
   const getScoreColor = (score: number) => {
@@ -164,8 +167,8 @@ const DataAnalyzerDemo = () => {
         <CardTitle className="flex items-center gap-2 text-lg">
           <BarChart3 className="w-5 h-5 text-primary" />
           {language === "es" ? "Analizador de Datos de Ventas" : "Sales Data Analyzer"}
-          <span className="text-xs bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full ml-auto">
-            Demo
+          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full ml-auto">
+            IA Real
           </span>
         </CardTitle>
       </CardHeader>
@@ -211,59 +214,40 @@ const DataAnalyzerDemo = () => {
 
         <Button onClick={analyze} disabled={isAnalyzing} className="w-full">
           {isAnalyzing ? (
-            <>{language === "es" ? "Analizando..." : "Analyzing..."}</>
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              {language === "es" ? "Analizando con IA..." : "Analyzing with AI..."}
+            </>
           ) : (
             <>
-              <BarChart3 className="w-4 h-4 mr-2" />
-              {language === "es" ? "Analizar mi embudo" : "Analyze my funnel"}
+              <Sparkles className="w-4 h-4 mr-2" />
+              {language === "es" ? "Analizar con IA" : "Analyze with AI"}
             </>
           )}
         </Button>
 
         {result && (
-          <div className="space-y-4 pt-2">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">
-                {language === "es" ? "Puntuación de rendimiento" : "Performance Score"}
-              </p>
-              <p className={`text-4xl font-bold ${getScoreColor(result.score)}`}>
-                {result.score}/100
-              </p>
-              <Progress value={result.score} className="mt-2" />
-            </div>
+          <div className="text-center py-2">
+            <p className="text-sm text-muted-foreground mb-1">
+              {language === "es" ? "Puntuación de rendimiento" : "Performance Score"}
+            </p>
+            <p className={`text-3xl font-bold ${getScoreColor(result.score)}`}>
+              {result.score}/100
+            </p>
+            <Progress value={result.score} className="mt-2" />
+          </div>
+        )}
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium">{language === "es" ? "Insights:" : "Insights:"}</p>
-              {result.insights.map((insight, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm">
-                  {insight.type === "positive" && <TrendingUp className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />}
-                  {insight.type === "warning" && <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />}
-                  {insight.type === "negative" && <TrendingDown className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />}
-                  <span>{insight.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {result.recommendations.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">
-                  {language === "es" ? "Recomendaciones:" : "Recommendations:"}
-                </p>
-                {result.recommendations.map((rec, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span>{rec}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+        {aiAnalysis && (
+          <div className="p-3 rounded-lg border bg-muted/30 max-h-48 overflow-y-auto">
+            <p className="text-sm whitespace-pre-wrap">{aiAnalysis}</p>
           </div>
         )}
 
         <p className="text-xs text-muted-foreground text-center">
           {language === "es"
-            ? "💡 Demo: Análisis basado en reglas. Conecta una API de IA para análisis predictivo."
-            : "💡 Demo: Rule-based analysis. Connect an AI API for predictive analytics."}
+            ? "🤖 Powered by Lovable AI - Análisis inteligente de tu embudo"
+            : "🤖 Powered by Lovable AI - Intelligent funnel analysis"}
         </p>
       </CardContent>
     </Card>
