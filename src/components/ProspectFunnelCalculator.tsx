@@ -261,39 +261,40 @@ const ProspectFunnelCalculator: React.FC = () => {
 
   return (
     <TooltipProvider>
-      <Card className="w-full bg-card/50 backdrop-blur-sm border-border/50">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/20">
-                <Users className="h-5 w-5 text-emerald-400" />
-              </div>
-              <div>
-                <CardTitle className="text-lg font-semibold text-foreground">{t.title}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t.subtitle}</p>
-              </div>
+      <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-6">
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full glass-effect rounded-xl p-4 sm:p-6 flex items-center justify-between gap-4 hover:bg-card/80 transition-all duration-300 group"
+        >
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {isExpanded ? (
-                <>
-                  {t.hideCalculator} <ChevronUp className="ml-2 h-4 w-4" />
-                </>
-              ) : (
-                <>
-                  {t.showCalculator} <ChevronDown className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+            <div className="text-left">
+              <h2 className="text-lg sm:text-xl font-bold text-foreground font-display">
+                {t.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {t.subtitle}
+              </p>
+            </div>
           </div>
-        </CardHeader>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              {isExpanded ? t.hideCalculator : t.showCalculator}
+            </span>
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            )}
+          </div>
+        </button>
 
+        {/* Calculator Content */}
         {isExpanded && (
-          <CardContent className="space-y-6">
+          <div className="mt-6 glass-effect rounded-xl p-4 sm:p-6 space-y-6">
             {/* Inputs Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
@@ -611,9 +612,9 @@ const ProspectFunnelCalculator: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
-          </CardContent>
+          </div>
         )}
-      </Card>
+      </div>
     </TooltipProvider>
   );
 };

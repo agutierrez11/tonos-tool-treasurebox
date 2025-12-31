@@ -133,43 +133,59 @@ const CallFunnelCalculator = () => {
     return issues.join(" ");
   };
 
+  const text = {
+    es: {
+      title: "Funnel de Llamadas",
+      subtitle: "Calcula cuántas llamadas necesitas para alcanzar tus metas de reuniones",
+      showCalculator: "Mostrar Calculadora",
+      hideCalculator: "Ocultar Calculadora",
+    },
+    en: {
+      title: "Call Funnel",
+      subtitle: "Calculate how many calls you need to reach your meeting goals",
+      showCalculator: "Show Calculator",
+      hideCalculator: "Hide Calculator",
+    },
+  };
+
+  const t = text[language];
+
   return (
-    <section className="py-8 sm:py-12 bg-gradient-to-b from-background to-secondary/20">
-      <div className="max-w-6xl mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between mb-8">
-          <div className="text-center flex-1">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-              {language === "es" ? "Funnel de Llamadas" : "Call Funnel"}
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-6">
+      {/* Toggle Button */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full glass-effect rounded-xl p-4 sm:p-6 flex items-center justify-between gap-4 hover:bg-card/80 transition-all duration-300 group"
+      >
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+            <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          </div>
+          <div className="text-left">
+            <h2 className="text-lg sm:text-xl font-bold text-foreground font-display">
+              {t.title}
             </h2>
-            <p className="text-muted-foreground">
-              {language === "es" 
-                ? "Calcula cuántas llamadas necesitas para alcanzar tus metas de reuniones"
-                : "Calculate how many calls you need to reach your meeting goals"
-              }
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              {t.subtitle}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            {isExpanded ? (
-              <>
-                {language === "es" ? "Ocultar" : "Hide"} <ChevronUp className="ml-2 h-4 w-4" />
-              </>
-            ) : (
-              <>
-                {language === "es" ? "Mostrar" : "Show"} <ChevronDown className="ml-2 h-4 w-4" />
-              </>
-            )}
-          </Button>
         </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground hidden sm:inline">
+            {isExpanded ? t.hideCalculator : t.showCalculator}
+          </span>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+          )}
+        </div>
+      </button>
 
-        {isExpanded && (
-        <>
-
-        <div className="grid lg:grid-cols-2 gap-8">
+      {/* Calculator Content */}
+      {isExpanded && (
+        <div className="mt-6 glass-effect rounded-xl p-4 sm:p-6 space-y-8">
+          <div className="grid lg:grid-cols-2 gap-8">
           {/* Inputs */}
           <div className="space-y-6 bg-card p-6 rounded-xl border border-border shadow-sm">
             <h3 className="font-semibold text-lg border-b border-border pb-2">
@@ -349,11 +365,10 @@ const CallFunnelCalculator = () => {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+          </div>
         </div>
-        </>
         )}
-      </div>
-    </section>
+    </div>
   );
 };
 
