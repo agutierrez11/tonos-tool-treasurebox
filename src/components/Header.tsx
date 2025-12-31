@@ -1,10 +1,11 @@
-import { Wrench, Sparkles } from "lucide-react";
+import { Wrench } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "./LanguageToggle";
 import { tools, categories } from "@/data/tools";
+import ToolSelector from "./ToolSelector";
 
 const Header = () => {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
 
   return (
     <header className="relative pt-8 sm:pt-12 md:pt-16 pb-8 sm:pb-10 md:pb-12 px-4 overflow-hidden">
@@ -21,31 +22,34 @@ const Header = () => {
       </div>
 
       <div className="relative max-w-6xl mx-auto text-center">
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full glass-effect mb-6 sm:mb-8 animate-fade-in">
-          <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-          <span className="text-xs sm:text-sm font-medium text-muted-foreground">
-            {t.header.badge}
-          </span>
-        </div>
-
         {/* Title */}
         <h1 
           className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in-up"
-          style={{ animationDelay: '100ms' }}
         >
-          <span className="text-foreground">{t.header.title1}</span>
+          <span className="text-foreground">
+            {language === "es" ? "Herramientas" : "Digital Tools"}
+          </span>
           <br />
-          <span className="text-gradient-primary">{t.header.title2}</span>
+          <span className="text-gradient-primary">
+            {language === "es" ? "para Vendedores" : "for Sellers"}
+          </span>
         </h1>
 
         {/* Subtitle */}
         <p 
-          className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed animate-fade-in px-2"
-          style={{ animationDelay: '200ms' }}
+          className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed animate-fade-in px-2 mb-8 sm:mb-10 md:mb-12"
+          style={{ animationDelay: '100ms' }}
         >
-          {t.header.subtitle}
+          {language === "es"
+            ? "Potencia tu proceso de ventas con las mejores herramientas digitales"
+            : "Power up your sales process with the best digital tools"
+          }
         </p>
+
+        {/* Tool Selector */}
+        <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <ToolSelector />
+        </div>
 
         {/* Stats */}
         <div 
@@ -54,17 +58,23 @@ const Header = () => {
         >
           <div className="text-center">
             <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">{tools.length}+</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.tools}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "es" ? "Herramientas" : "Tools"}
+            </div>
           </div>
           <div className="w-px h-8 sm:h-10 bg-border hidden sm:block" />
           <div className="text-center">
             <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">{categories.length}</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.categories}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "es" ? "Categorías" : "Categories"}
+            </div>
           </div>
           <div className="w-px h-8 sm:h-10 bg-border hidden sm:block" />
           <div className="text-center">
             <div className="font-display text-2xl sm:text-3xl font-bold text-gradient-primary">100%</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{t.header.free}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">
+              {language === "es" ? "Gratuito" : "Free"}
+            </div>
           </div>
         </div>
 
