@@ -1,138 +1,122 @@
 import { useState } from "react";
-import { Search, ExternalLink, Star, DollarSign, Users } from "lucide-react";
+import { Search, ExternalLink, Star, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 import { tools } from "@/data/tools";
-
-interface SearchResult {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  relevance: number;
-  reason: string;
-}
 
 const SmartSearchDemo = () => {
   const { language } = useLanguage();
+  const { toast } = useToast();
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [aiResponse, setAiResponse] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  const searchReasons: Record<string, Record<string, string>> = {
-    es: {
-      email: "Ideal para automatizar campañas y seguimiento de leads por email",
-      crm: "Perfecto para gestionar relaciones con clientes y pipeline de ventas",
-      analytics: "Te ayudará a medir y optimizar el rendimiento de tus acciones",
-      prospecting: "Excelente para encontrar y calificar nuevos prospectos",
-      automation: "Automatiza tareas repetitivas para enfocarte en vender",
-      communication: "Mejora la comunicación con tu equipo y clientes",
-    },
-    en: {
-      email: "Ideal for automating campaigns and email lead follow-up",
-      crm: "Perfect for managing customer relationships and sales pipeline",
-      analytics: "Will help you measure and optimize your actions' performance",
-      prospecting: "Excellent for finding and qualifying new prospects",
-      automation: "Automate repetitive tasks to focus on selling",
-      communication: "Improve communication with your team and clients",
-    },
-  };
-
-  const getReasonForTool = (tool: typeof tools[0]) => {
-    const reasons = searchReasons[language];
-    if (tool.categoryId === "email-marketing") return reasons.email;
-    if (tool.categoryId === "crm") return reasons.crm;
-    if (tool.categoryId === "seo-analytics") return reasons.analytics;
-    if (tool.categoryId === "prospecting" || tool.categoryId === "cold-calling") return reasons.prospecting;
-    if (tool.categoryId === "productivity") return reasons.automation;
-    return reasons.communication;
-  };
-
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!query.trim()) return;
 
     setIsSearching(true);
-    setResults([]);
+    setAiResponse("");
 
-    setTimeout(() => {
-      const searchTerms = query.toLowerCase().split(" ");
-      
-      const matchedTools = tools
-        .map((tool) => {
-          const nameMatch = searchTerms.some((term) =>
-            tool.name.toLowerCase().includes(term)
-          );
-          const descMatch = searchTerms.some((term) =>
-            tool.description.en.toLowerCase().includes(term) ||
-            tool.description.es.toLowerCase().includes(term)
-          );
-          const categoryMatch = searchTerms.some((term) =>
-            tool.categoryId.toLowerCase().includes(term)
-          );
-          const needsMatch = tool.needs?.some((need) =>
-            searchTerms.some((term) => need.toLowerCase().includes(term))
-          );
+    // Create a summary of available tools for context
+    const toolsSummary = tools.slice(0, 30).map(t => 
+      `- ${t.name}: ${language === "es" ? t.description.es : t.description.en} (${t.categoryId}, ${t.pricing})`
+    ).join("\n");
 
-          let relevance = 0;
-          if (nameMatch) relevance += 40;
-          if (descMatch) relevance += 30;
-          if (categoryMatch) relevance += 20;
-          if (needsMatch) relevance += 10;
+    const prompt = language === "es"
+      ? `El usuario busca: "${query}"
 
-          // Bonus for common sales terms
-          const salesTerms = ["ventas", "sales", "lead", "crm", "email", "prospecting", "llamadas", "calls"];
-          if (salesTerms.some((term) => query.toLowerCase().includes(term))) {
-            relevance += 15;
-          }
+Herramientas disponibles en nuestro catálogo:
+${toolsSummary}
 
-          return {
-            id: tool.id,
-            name: tool.name,
-            description: language === "es" ? tool.description.es : tool.description.en,
-            url: tool.url,
-            relevance,
-            reason: getReasonForTool(tool),
-          };
-        })
-        .filter((result) => result.relevance > 0)
-        .sort((a, b) => b.relevance - a.relevance)
-        .slice(0, 5);
+Basándote en la búsqueda del usuario:
+1. Recomienda las 3 herramientas más relevantes de la lista
+2. Explica brevemente por qué cada una es útil para su necesidad
+3. Si ninguna herramienta encaja perfectamente, sugiere la más cercana y explica qué considerar
 
-      // If no matches, show random relevant tools
-      if (matchedTools.length === 0) {
-        const randomTools = tools
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
-          .map((tool) => ({
-            id: tool.id,
-            name: tool.name,
-            description: language === "es" ? tool.description.es : tool.description.en,
-            url: tool.url,
-            relevance: 50,
-            reason: getReasonForTool(tool),
-          }));
-        setResults(randomTools);
-      } else {
-        setResults(matchedTools);
+Responde de forma concisa y práctica.`
+      : `User is looking for: "${query}"
+
+Tools available in our catalog:
+${toolsSummary}
+
+Based on the user's search:
+1. Recommend the 3 most relevant tools from the list
+2. Briefly explain why each is useful for their need
+3. If no tool fits perfectly, suggest the closest one and explain what to consider
+
+Respond concisely and practically.`;
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            messages: [{ role: "user", content: prompt }],
+            type: "search",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error en la respuesta");
       }
 
-      setIsSearching(false);
-    }, 800);
-  };
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No reader available");
 
-  const getPricingIcon = (pricing: string) => {
-    switch (pricing) {
-      case "free":
-        return <Badge variant="secondary" className="text-xs">Free</Badge>;
-      case "freemium":
-        return <Badge variant="outline" className="text-xs">Freemium</Badge>;
-      default:
-        return <Badge className="text-xs">Paid</Badge>;
+      const decoder = new TextDecoder();
+      let content = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+            try {
+              const jsonStr = line.slice(6).trim();
+              if (jsonStr) {
+                const parsed = JSON.parse(jsonStr);
+                const delta = parsed.choices?.[0]?.delta?.content;
+                if (delta) {
+                  content += delta;
+                  setAiResponse(content);
+                }
+              }
+            } catch {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      toast({
+        variant: "destructive",
+        title: language === "es" ? "Error" : "Error",
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
+    } finally {
+      setIsSearching(false);
     }
   };
+
+  // Quick suggestions
+  const suggestions = language === "es"
+    ? ["CRM para startups", "Automatizar emails fríos", "Verificar emails", "Análisis de competencia"]
+    : ["CRM for startups", "Automate cold emails", "Email verification", "Competitor analysis"];
 
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
@@ -140,8 +124,8 @@ const SmartSearchDemo = () => {
         <CardTitle className="flex items-center gap-2 text-lg">
           <Search className="w-5 h-5 text-primary" />
           {language === "es" ? "Buscador Inteligente de Herramientas" : "Smart Tool Finder"}
-          <span className="text-xs bg-amber-500/20 text-amber-600 px-2 py-0.5 rounded-full ml-auto">
-            Demo
+          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full ml-auto">
+            IA Real
           </span>
         </CardTitle>
       </CardHeader>
@@ -153,83 +137,55 @@ const SmartSearchDemo = () => {
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder={
               language === "es"
-                ? "Ej: herramienta para enviar emails en frío"
-                : "E.g.: tool for sending cold emails"
+                ? "Describe qué necesitas..."
+                : "Describe what you need..."
             }
             className="flex-1"
           />
           <Button onClick={handleSearch} disabled={isSearching}>
-            <Search className="w-4 h-4" />
+            {isSearching ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
           </Button>
         </div>
 
-        {isSearching && (
-          <div className="text-center py-4">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              {language === "es" ? "Buscando las mejores herramientas..." : "Finding the best tools..."}
-            </div>
-          </div>
-        )}
-
-        {results.length > 0 && !isSearching && (
-          <div className="space-y-3">
-            <p className="text-sm font-medium">
-              {language === "es" ? "Herramientas recomendadas:" : "Recommended tools:"}
-            </p>
-            {results.map((result) => (
-              <div
-                key={result.id}
-                className="p-3 rounded-lg border bg-background hover:border-primary/50 transition-colors"
+        {!aiResponse && !isSearching && (
+          <div className="flex flex-wrap gap-2">
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => {
+                  setQuery(suggestion);
+                }}
+                className="text-xs px-2 py-1 rounded-full bg-muted hover:bg-muted/80 transition-colors"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-sm truncate">{result.name}</h4>
-                      <div className="flex items-center gap-1">
-                        {[...Array(Math.min(5, Math.ceil(result.relevance / 20)))].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="w-3 h-3 fill-amber-400 text-amber-400"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                      {result.description}
-                    </p>
-                    <p className="text-xs text-primary mt-1 italic">
-                      💡 {result.reason}
-                    </p>
-                  </div>
-                  <a
-                    href={result.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-shrink-0"
-                  >
-                    <Button size="sm" variant="outline" className="h-8">
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </a>
-                </div>
-              </div>
+                {suggestion}
+              </button>
             ))}
           </div>
         )}
 
-        {results.length === 0 && !isSearching && query && (
-          <p className="text-sm text-center text-muted-foreground py-4">
-            {language === "es"
-              ? "No se encontraron herramientas. Intenta con otros términos."
-              : "No tools found. Try different terms."}
-          </p>
+        {isSearching && (
+          <div className="text-center py-4">
+            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {language === "es" ? "Buscando con IA..." : "Searching with AI..."}
+            </div>
+          </div>
+        )}
+
+        {aiResponse && (
+          <div className="p-3 rounded-lg border bg-muted/30 max-h-64 overflow-y-auto">
+            <p className="text-sm whitespace-pre-wrap">{aiResponse}</p>
+          </div>
         )}
 
         <p className="text-xs text-muted-foreground text-center">
           {language === "es"
-            ? "💡 Demo: Búsqueda por coincidencia de texto. Conecta una API de IA para búsqueda semántica."
-            : "💡 Demo: Text matching search. Connect an AI API for semantic search."}
+            ? "🤖 Powered by Lovable AI - Búsqueda semántica inteligente"
+            : "🤖 Powered by Lovable AI - Intelligent semantic search"}
         </p>
       </CardContent>
     </Card>
