@@ -1,5 +1,6 @@
 import { Heart } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import authorPhoto from "@/assets/author-profile.png";
 
 const Footer = () => {
   const { t, language } = useLanguage();
@@ -15,9 +16,11 @@ const Footer = () => {
             rel="noopener noreferrer"
             className="group"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-primary-foreground font-bold text-xl sm:text-2xl shadow-lg group-hover:scale-105 transition-transform">
-              AG
-            </div>
+            <img 
+              src={authorPhoto} 
+              alt="AGJ Business" 
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-lg group-hover:scale-105 transition-transform ring-2 ring-primary/20"
+            />
           </a>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
