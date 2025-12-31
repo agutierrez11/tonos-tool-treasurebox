@@ -1,9 +1,18 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Calculator, TrendingUp, Users, Calendar, Target, DollarSign, Info, ChevronDown, ChevronUp, BookOpen, Lightbulb } from "lucide-react";
+import { Calculator, TrendingUp, Users, Calendar, Target, DollarSign, Info, ChevronDown, ChevronUp, BookOpen, Lightbulb, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type TimePeriod = "monthly" | "quarterly" | "semiannual" | "annual";
 import {
   Tooltip,
   TooltipContent,
@@ -55,6 +64,7 @@ const FUNNEL_COLORS = [
 const SalesCalculator = () => {
   const { language } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("monthly");
   const [inputs, setInputs] = useState<CalculatorInputs>({
     metaVentas: 5,
     ticketPromedio: 10000,
@@ -73,6 +83,50 @@ const SalesCalculator = () => {
     ingresos: 0,
     conversionTotal: 0,
   });
+
+  const periodLabels = {
+    es: {
+      monthly: "Mensual",
+      quarterly: "Trimestral",
+      semiannual: "Semestral",
+      annual: "Anual",
+      periodLabel: "Período de la meta",
+      perMonth: "/mes",
+      perQuarter: "/trimestre",
+      perSemester: "/semestre",
+      perYear: "/año",
+    },
+    en: {
+      monthly: "Monthly",
+      quarterly: "Quarterly",
+      semiannual: "Semi-annual",
+      annual: "Annual",
+      periodLabel: "Goal period",
+      perMonth: "/month",
+      perQuarter: "/quarter",
+      perSemester: "/semester",
+      perYear: "/year",
+    },
+  };
+
+  const getPeriodMultiplier = (period: TimePeriod): number => {
+    switch (period) {
+      case "monthly": return 1;
+      case "quarterly": return 3;
+      case "semiannual": return 6;
+      case "annual": return 12;
+    }
+  };
+
+  const getPeriodSuffix = (): string => {
+    const labels = periodLabels[language];
+    switch (timePeriod) {
+      case "monthly": return labels.perMonth;
+      case "quarterly": return labels.perQuarter;
+      case "semiannual": return labels.perSemester;
+      case "annual": return labels.perYear;
+    }
+  };
 
   const t = {
     es: {
@@ -98,8 +152,8 @@ const SalesCalculator = () => {
       ingresos: "Ingresos Proyectados",
       conversionTotal: "Conversión Total",
       benchmark: "Benchmark B2B",
-      conclusion: (leads: number, ventas: number) =>
-        `Para alcanzar tu meta de ${ventas} ventas, necesitas generar aproximadamente ${leads} leads.`,
+      conclusion: (leads: number, ventas: number, period: string) =>
+        `Para alcanzar tu meta de ${ventas} ventas ${period}, necesitas generar aproximadamente ${leads} leads en ese período.`,
       sources: "Fuentes: HubSpot, Salesforce, MarketingSherpa (Benchmarks B2B/SaaS)",
       tooltips: {
         crLeadContacto: "Capacidad de prospección y alcance inicial",
@@ -174,8 +228,8 @@ const SalesCalculator = () => {
       ingresos: "Projected Revenue",
       conversionTotal: "Total Conversion",
       benchmark: "B2B Benchmark",
-      conclusion: (leads: number, ventas: number) =>
-        `To reach your goal of ${ventas} sales, you need approximately ${leads} leads.`,
+      conclusion: (leads: number, ventas: number, period: string) =>
+        `To reach your goal of ${ventas} sales ${period}, you need approximately ${leads} leads in that period.`,
       sources: "Sources: HubSpot, Salesforce, MarketingSherpa (B2B/SaaS Benchmarks)",
       tooltips: {
         crLeadContacto: "Initial prospecting and outreach capacity",
@@ -375,11 +429,30 @@ const SalesCalculator = () => {
                 <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 {text.inputsTitle}
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Período */}
+                <div className="space-y-2">
+                  <Label className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Clock className="w-3 h-3" />
+                    {periodLabels[language].periodLabel}
+                  </Label>
+                  <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
+                    <SelectTrigger className="bg-secondary/50 border-border">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monthly">{periodLabels[language].monthly}</SelectItem>
+                      <SelectItem value="quarterly">{periodLabels[language].quarterly}</SelectItem>
+                      <SelectItem value="semiannual">{periodLabels[language].semiannual}</SelectItem>
+                      <SelectItem value="annual">{periodLabels[language].annual}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Meta Ventas */}
                 <div className="space-y-2">
                   <Label className="text-sm text-muted-foreground">
-                    {text.metaVentas}
+                    {text.metaVentas} ({periodLabels[language][timePeriod].toLowerCase()})
                   </Label>
                   <Input
                     type="number"
@@ -684,7 +757,9 @@ const SalesCalculator = () => {
               <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 sm:p-5">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-xs text-muted-foreground">{text.ingresos}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {text.ingresos} ({periodLabels[language][timePeriod].toLowerCase()})
+                    </p>
                     <p className="text-2xl sm:text-3xl font-bold text-gradient-primary">
                       {formatCurrency(results.ingresos)}
                     </p>
@@ -697,8 +772,54 @@ const SalesCalculator = () => {
                   </div>
                 </div>
                 <p className="text-sm text-foreground/80">
-                  {text.conclusion(results.leads, results.ventas)}
+                  {text.conclusion(results.leads, results.ventas, periodLabels[language][timePeriod].toLowerCase())}
                 </p>
+
+                {/* Monthly Breakdown (when period is not monthly) */}
+                {timePeriod !== "monthly" && (
+                  <div className="mt-4 pt-4 border-t border-primary/20">
+                    <p className="text-xs text-muted-foreground mb-3">
+                      {language === "es" ? "Desglose mensual aproximado:" : "Approximate monthly breakdown:"}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      <div className="bg-background/50 rounded p-2 text-center">
+                        <p className="text-[10px] text-muted-foreground">{text.leads}</p>
+                        <p className="text-sm font-semibold text-primary">
+                          {Math.ceil(results.leads / getPeriodMultiplier(timePeriod)).toLocaleString()}
+                          <span className="text-[10px] text-muted-foreground">{periodLabels[language].perMonth}</span>
+                        </p>
+                      </div>
+                      <div className="bg-background/50 rounded p-2 text-center">
+                        <p className="text-[10px] text-muted-foreground">{text.contactos}</p>
+                        <p className="text-sm font-semibold text-accent">
+                          {Math.ceil(results.contactos / getPeriodMultiplier(timePeriod)).toLocaleString()}
+                          <span className="text-[10px] text-muted-foreground">{periodLabels[language].perMonth}</span>
+                        </p>
+                      </div>
+                      <div className="bg-background/50 rounded p-2 text-center">
+                        <p className="text-[10px] text-muted-foreground">{text.reuniones}</p>
+                        <p className="text-sm font-semibold text-yellow-500">
+                          {Math.ceil(results.reuniones / getPeriodMultiplier(timePeriod)).toLocaleString()}
+                          <span className="text-[10px] text-muted-foreground">{periodLabels[language].perMonth}</span>
+                        </p>
+                      </div>
+                      <div className="bg-background/50 rounded p-2 text-center">
+                        <p className="text-[10px] text-muted-foreground">{text.oportunidades}</p>
+                        <p className="text-sm font-semibold text-green-500">
+                          {(results.oportunidades / getPeriodMultiplier(timePeriod)).toFixed(1)}
+                          <span className="text-[10px] text-muted-foreground">{periodLabels[language].perMonth}</span>
+                        </p>
+                      </div>
+                      <div className="bg-background/50 rounded p-2 text-center col-span-2 sm:col-span-1">
+                        <p className="text-[10px] text-muted-foreground">{text.ventas}</p>
+                        <p className="text-sm font-semibold text-destructive">
+                          {(results.ventas / getPeriodMultiplier(timePeriod)).toFixed(1)}
+                          <span className="text-[10px] text-muted-foreground">{periodLabels[language].perMonth}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Optimization Warnings */}
