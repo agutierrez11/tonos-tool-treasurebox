@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type TimePeriod = "monthly" | "quarterly" | "semiannual" | "annual";
+type TimePeriod = "daily" | "weekly" | "monthly" | "quarterly" | "semiannual" | "annual";
 import {
   Tooltip,
   TooltipContent,
@@ -86,22 +86,30 @@ const SalesCalculator = () => {
 
   const periodLabels = {
     es: {
+      daily: "Diario",
+      weekly: "Semanal",
       monthly: "Mensual",
       quarterly: "Trimestral",
       semiannual: "Semestral",
       annual: "Anual",
       periodLabel: "Período de la meta",
+      perDay: "/día",
+      perWeek: "/semana",
       perMonth: "/mes",
       perQuarter: "/trimestre",
       perSemester: "/semestre",
       perYear: "/año",
     },
     en: {
+      daily: "Daily",
+      weekly: "Weekly",
       monthly: "Monthly",
       quarterly: "Quarterly",
       semiannual: "Semi-annual",
       annual: "Annual",
       periodLabel: "Goal period",
+      perDay: "/day",
+      perWeek: "/week",
       perMonth: "/month",
       perQuarter: "/quarter",
       perSemester: "/semester",
@@ -111,6 +119,8 @@ const SalesCalculator = () => {
 
   const getPeriodMultiplier = (period: TimePeriod): number => {
     switch (period) {
+      case "daily": return 1/30;
+      case "weekly": return 1/4;
       case "monthly": return 1;
       case "quarterly": return 3;
       case "semiannual": return 6;
@@ -121,6 +131,8 @@ const SalesCalculator = () => {
   const getPeriodSuffix = (): string => {
     const labels = periodLabels[language];
     switch (timePeriod) {
+      case "daily": return labels.perDay;
+      case "weekly": return labels.perWeek;
       case "monthly": return labels.perMonth;
       case "quarterly": return labels.perQuarter;
       case "semiannual": return labels.perSemester;
@@ -441,6 +453,8 @@ const SalesCalculator = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="daily">{periodLabels[language].daily}</SelectItem>
+                      <SelectItem value="weekly">{periodLabels[language].weekly}</SelectItem>
                       <SelectItem value="monthly">{periodLabels[language].monthly}</SelectItem>
                       <SelectItem value="quarterly">{periodLabels[language].quarterly}</SelectItem>
                       <SelectItem value="semiannual">{periodLabels[language].semiannual}</SelectItem>
@@ -775,11 +789,14 @@ const SalesCalculator = () => {
                   {text.conclusion(results.leads, results.ventas, periodLabels[language][timePeriod].toLowerCase())}
                 </p>
 
-                {/* Monthly Breakdown (when period is not monthly) */}
+                {/* Period Breakdown (when period is not monthly) */}
                 {timePeriod !== "monthly" && (
                   <div className="mt-4 pt-4 border-t border-primary/20">
                     <p className="text-xs text-muted-foreground mb-3">
-                      {language === "es" ? "Desglose mensual aproximado:" : "Approximate monthly breakdown:"}
+                      {language === "es" 
+                        ? `Equivalente mensual aproximado${timePeriod === "daily" || timePeriod === "weekly" ? " (proyectado a mes):" : ":"}`
+                        : `Approximate monthly equivalent${timePeriod === "daily" || timePeriod === "weekly" ? " (projected to month):" : ":"}`
+                      }
                     </p>
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                       <div className="bg-background/50 rounded p-2 text-center">
