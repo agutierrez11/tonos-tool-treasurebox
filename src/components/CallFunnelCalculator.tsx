@@ -33,9 +33,12 @@ const benchmarks = {
   reunionesConversaciones: { min: 5, max: 15, avg: 10 },
 };
 
+type TimePeriod = 'daily' | 'weekly' | 'monthly';
+
 const CallFunnelCalculator = () => {
   const { language } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
   
   // Datos reales del usuario
   const [llamadasRealizadas, setLlamadasRealizadas] = useState(100);
@@ -137,6 +140,11 @@ const CallFunnelCalculator = () => {
     return issues.join(" ");
   };
 
+  const timePeriodLabels = {
+    es: { daily: 'Diario', weekly: 'Semanal', monthly: 'Mensual' },
+    en: { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' },
+  };
+
   const text = {
     es: {
       title: "Funnel de Llamadas",
@@ -150,6 +158,7 @@ const CallFunnelCalculator = () => {
       reunion: "Reunión",
       tasaConversion: "Tasa de Conversión",
       conversionTotal: "Conversión Total",
+      periodo: "Período",
     },
     en: {
       title: "Call Funnel",
@@ -163,6 +172,7 @@ const CallFunnelCalculator = () => {
       reunion: "Meeting",
       tasaConversion: "Conversion Rate",
       conversionTotal: "Total Conversion",
+      periodo: "Period",
     },
   };
 
@@ -203,6 +213,26 @@ const CallFunnelCalculator = () => {
       {/* Calculator Content */}
       {isExpanded && (
         <div className="mt-6 glass-effect rounded-xl p-4 sm:p-6 space-y-8">
+          {/* Time Period Selector */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-medium text-muted-foreground">{t.periodo}:</span>
+            <div className="flex gap-2">
+              {(['daily', 'weekly', 'monthly'] as TimePeriod[]).map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setTimePeriod(period)}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                    timePeriod === period
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                  }`}
+                >
+                  {timePeriodLabels[language][period]}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Inputs - Formulario de datos */}
             <div className="space-y-6 bg-card p-6 rounded-xl border border-border shadow-sm">

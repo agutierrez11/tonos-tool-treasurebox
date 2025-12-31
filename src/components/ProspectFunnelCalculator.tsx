@@ -30,9 +30,12 @@ interface FunnelStage {
   conversionRate?: number;
 }
 
+type TimePeriod = 'daily' | 'weekly' | 'monthly';
+
 const ProspectFunnelCalculator: React.FC = () => {
   const { language } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
   
   // Datos reales del usuario (basado en el Excel)
   const [prospectosGenerados, setProspectosGenerados] = useState(500);
@@ -155,6 +158,11 @@ const ProspectFunnelCalculator: React.FC = () => {
     },
   ];
 
+  const timePeriodLabels = {
+    es: { daily: 'Diario', weekly: 'Semanal', monthly: 'Mensual' },
+    en: { daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly' },
+  };
+
   const texts = {
     es: {
       title: 'Funnel de Prospectos',
@@ -176,6 +184,7 @@ const ProspectFunnelCalculator: React.FC = () => {
       diagnóstico: 'Diagnóstico',
       embudoSaludable: '¡Excelente! Tu embudo de prospectos está saludable.',
       consejos: 'Consejos para mejorar tu funnel de prospectos',
+      periodo: 'Período',
     },
     en: {
       title: 'Prospect Funnel',
@@ -197,6 +206,7 @@ const ProspectFunnelCalculator: React.FC = () => {
       diagnóstico: 'Diagnosis',
       embudoSaludable: 'Excellent! Your prospect funnel is healthy.',
       consejos: 'Tips to improve your prospect funnel',
+      periodo: 'Period',
     },
   };
 
@@ -239,6 +249,26 @@ const ProspectFunnelCalculator: React.FC = () => {
         {/* Calculator Content */}
         {isExpanded && (
           <div className="mt-6 glass-effect rounded-xl p-4 sm:p-6 space-y-8">
+            {/* Time Period Selector */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground">{t.periodo}:</span>
+              <div className="flex gap-2">
+                {(['daily', 'weekly', 'monthly'] as TimePeriod[]).map((period) => (
+                  <button
+                    key={period}
+                    onClick={() => setTimePeriod(period)}
+                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                      timePeriod === period
+                        ? 'bg-primary text-primary-foreground shadow-md'
+                        : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    {timePeriodLabels[language][period]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Inputs - Formulario de datos */}
               <div className="space-y-6 bg-card p-6 rounded-xl border border-border shadow-sm">
