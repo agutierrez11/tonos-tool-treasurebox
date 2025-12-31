@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Users, Phone, Calendar, CheckCircle2, Target, Info, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, AlertTriangle } from 'lucide-react';
+import { Users, Phone, Calendar, CheckCircle2, Target, Info, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, AlertTriangle, Lightbulb, Wrench, BookOpen, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const FUNNEL_COLORS = {
@@ -545,6 +545,148 @@ const ProspectFunnelCalculator: React.FC = () => {
                           <li>• {language === 'es' ? 'Califica antes de la reunión' : 'Qualify before meeting'}</li>
                           <li>• {language === 'es' ? 'Demo personalizada' : 'Personalized demo'}</li>
                           <li>• {language === 'es' ? 'Define próximos pasos' : 'Define next steps'}</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Herramientas Recomendadas */}
+                <AccordionItem value="tools" className="border-t border-border">
+                  <AccordionTrigger className="px-4 hover:no-underline">
+                    <span className="font-semibold flex items-center gap-2">
+                      <Wrench className="w-4 h-4" />
+                      {language === 'es' ? 'Herramientas Recomendadas' : 'Recommended Tools'}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                      <a href="https://www.hubspot.com/products/crm" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">HubSpot CRM</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'CRM gratuito con seguimiento de prospectos' : 'Free CRM with prospect tracking'}
+                        </p>
+                      </a>
+                      <a href="https://www.apollo.io/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">Apollo.io</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'Base de datos B2B y automatización de outreach' : 'B2B database and outreach automation'}
+                        </p>
+                      </a>
+                      <a href="https://www.linkedin.com/sales/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">LinkedIn Sales Navigator</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'Prospección avanzada en LinkedIn' : 'Advanced LinkedIn prospecting'}
+                        </p>
+                      </a>
+                      <a href="https://www.zoominfo.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">ZoomInfo</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'Inteligencia de datos B2B premium' : 'Premium B2B data intelligence'}
+                        </p>
+                      </a>
+                      <a href="https://www.pipedrive.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">Pipedrive</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'CRM visual orientado a ventas' : 'Visual sales-oriented CRM'}
+                        </p>
+                      </a>
+                      <a href="https://lemlist.com/" target="_blank" rel="noopener noreferrer" className="p-3 bg-secondary/50 rounded-lg hover:bg-secondary/80 transition-colors group">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-semibold">Lemlist</h5>
+                          <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          {language === 'es' ? 'Cold email y personalización con IA' : 'Cold email and AI personalization'}
+                        </p>
+                      </a>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Recursos Educativos */}
+                <AccordionItem value="resources" className="border-t border-border">
+                  <AccordionTrigger className="px-4 hover:no-underline">
+                    <span className="font-semibold flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      {language === 'es' ? 'Recursos para Mejorar' : 'Resources to Improve'}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-3">
+                        <h5 className="font-semibold text-primary flex items-center gap-2">
+                          <Lightbulb className="w-4 h-4" />
+                          {language === 'es' ? 'Libros Recomendados' : 'Recommended Books'}
+                        </h5>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            <span><strong>Predictable Revenue</strong> - Aaron Ross</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            <span><strong>The Challenger Sale</strong> - M. Dixon & B. Adamson</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            <span><strong>SPIN Selling</strong> - Neil Rackham</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-primary">•</span>
+                            <span><strong>Gap Selling</strong> - Keenan</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="space-y-3">
+                        <h5 className="font-semibold text-primary flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4" />
+                          {language === 'es' ? 'Cursos y Materiales' : 'Courses and Materials'}
+                        </h5>
+                        <ul className="space-y-2">
+                          <li>
+                            <a href="https://www.coursera.org/learn/sales-training-techniques-for-a-human-centric-sales-process" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                              <span className="text-primary">•</span>
+                              <span>Sales Training - Coursera</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://www.linkedin.com/learning/paths/become-a-sales-representative" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                              <span className="text-primary">•</span>
+                              <span>LinkedIn Learning - Sales Rep</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://www.youtube.com/@patrickhkot" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                              <span className="text-primary">•</span>
+                              <span>Patrick Dang (YouTube)</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </li>
+                          <li>
+                            <a href="https://blog.hubspot.com/sales" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+                              <span className="text-primary">•</span>
+                              <span>HubSpot Sales Blog</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </li>
                         </ul>
                       </div>
                     </div>
