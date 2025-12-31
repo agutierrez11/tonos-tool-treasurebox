@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Phone, PhoneCall, MessageSquare, Calendar, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Phone, PhoneCall, MessageSquare, Calendar, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,6 +29,7 @@ interface FunnelStage {
 
 const CallFunnelCalculator = () => {
   const { language } = useLanguage();
+  const [isExpanded, setIsExpanded] = useState(false);
   
   const [metaReuniones, setMetaReuniones] = useState(10);
   const [crConectadasLlamadas, setCrConectadasLlamadas] = useState(36.6);
@@ -134,17 +136,38 @@ const CallFunnelCalculator = () => {
   return (
     <section className="py-8 sm:py-12 bg-gradient-to-b from-background to-secondary/20">
       <div className="max-w-6xl mx-auto px-3 sm:px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2">
-            {language === "es" ? "Funnel de Llamadas" : "Call Funnel"}
-          </h2>
-          <p className="text-muted-foreground">
-            {language === "es" 
-              ? "Calcula cuántas llamadas necesitas para alcanzar tus metas de reuniones"
-              : "Calculate how many calls you need to reach your meeting goals"
-            }
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="text-center flex-1">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">
+              {language === "es" ? "Funnel de Llamadas" : "Call Funnel"}
+            </h2>
+            <p className="text-muted-foreground">
+              {language === "es" 
+                ? "Calcula cuántas llamadas necesitas para alcanzar tus metas de reuniones"
+                : "Calculate how many calls you need to reach your meeting goals"
+              }
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {isExpanded ? (
+              <>
+                {language === "es" ? "Ocultar" : "Hide"} <ChevronUp className="ml-2 h-4 w-4" />
+              </>
+            ) : (
+              <>
+                {language === "es" ? "Mostrar" : "Show"} <ChevronDown className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
         </div>
+
+        {isExpanded && (
+        <>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Inputs */}
@@ -327,6 +350,8 @@ const CallFunnelCalculator = () => {
             </AccordionItem>
           </Accordion>
         </div>
+        </>
+        )}
       </div>
     </section>
   );
