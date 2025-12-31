@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import CategoryNav from "@/components/CategoryNav";
 import CategorySection from "@/components/CategorySection";
 import Footer from "@/components/Footer";
+import SalesCalculator from "@/components/SalesCalculator";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -19,6 +20,10 @@ const Index = () => {
       </title>
       
       <Header />
+      
+      {/* Sales Calculator */}
+      <SalesCalculator />
+      
       <CategoryNav />
       
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10 md:py-12">
