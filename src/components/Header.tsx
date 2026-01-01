@@ -31,12 +31,16 @@ const Header = () => {
             rel="noopener noreferrer"
             className="group relative"
           >
+            {/* Animated glow ring */}
+            <div className="absolute -inset-1.5 bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-full opacity-50 group-hover:opacity-100 blur-md group-hover:blur-lg transition-all duration-500 animate-[spin_4s_linear_infinite]" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-pink-500 rounded-full opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
+            
             <img 
               src={authorPhoto} 
               alt="AGJ Business" 
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-lg group-hover:scale-105 transition-transform ring-2 ring-primary/30 group-hover:ring-primary/50"
+              className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-lg group-hover:scale-110 transition-all duration-300 ring-2 ring-background"
             />
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#0077B5] rounded-full flex items-center justify-center shadow-md">
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#0077B5] rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
               <Linkedin className="w-3.5 h-3.5 text-white" />
             </div>
           </a>
