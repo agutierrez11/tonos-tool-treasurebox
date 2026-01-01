@@ -8,6 +8,7 @@ import CallFunnelCalculator from "@/components/CallFunnelCalculator";
 import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
+import PipelineFilter from "@/components/PipelineFilter";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -39,6 +40,9 @@ const Index = () => {
       
       {/* AI Agents Section */}
       <AIAgentsSection />
+      
+      {/* Pipeline Filter */}
+      <PipelineFilter />
       
       <CategoryNav />
       
