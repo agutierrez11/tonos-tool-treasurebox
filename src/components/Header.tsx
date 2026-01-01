@@ -1,8 +1,9 @@
-import { Wrench } from "lucide-react";
+import { Wrench, Heart, Linkedin } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "./LanguageToggle";
 import { tools, categories } from "@/data/tools";
 import ToolSelector from "./ToolSelector";
+import authorPhoto from "@/assets/author-profile.png";
 
 const Header = () => {
   const { language } = useLanguage();
@@ -22,6 +23,44 @@ const Header = () => {
       </div>
 
       <div className="relative max-w-6xl mx-auto text-center">
+        {/* Author Section - Top */}
+        <div className="flex flex-col items-center gap-3 mb-6 sm:mb-8 animate-fade-in">
+          <a 
+            href="https://www.linkedin.com/in/agjbusiness/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="group relative"
+          >
+            <img 
+              src={authorPhoto} 
+              alt="AGJ Business" 
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow-lg group-hover:scale-105 transition-transform ring-2 ring-primary/30 group-hover:ring-primary/50"
+            />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#0077B5] rounded-full flex items-center justify-center shadow-md">
+              <Linkedin className="w-3.5 h-3.5 text-white" />
+            </div>
+          </a>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
+            <span className="text-sm sm:text-base font-medium">
+              {language === "es" 
+                ? "Hecho con el Corazón, de vendedor a vendedor" 
+                : "Made with Heart, from salesperson to salesperson"}
+            </span>
+            <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
+          </div>
+          <a 
+            href="https://www.linkedin.com/in/agjbusiness/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline flex items-center gap-1"
+          >
+            <Linkedin className="w-3 h-3" />
+            @agjbusiness
+          </a>
+        </div>
+
+        {/* Title */}
         {/* Title */}
         <h1 
           className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in-up"
