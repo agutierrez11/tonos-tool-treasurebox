@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFunnelMetrics } from "@/contexts/FunnelMetricsContext";
 import { Phone, PhoneCall, MessageSquare, Calendar, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, Lightbulb, Wrench, BookOpen, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,14 +38,25 @@ type TimePeriod = 'daily' | 'weekly' | 'monthly';
 
 const CallFunnelCalculator = () => {
   const { language } = useLanguage();
+  const { callMetrics, setCallMetrics } = useFunnelMetrics();
   const [isExpanded, setIsExpanded] = useState(false);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
   
-  // Datos reales del usuario
-  const [llamadasRealizadas, setLlamadasRealizadas] = useState(100);
-  const [contestadas, setContestadas] = useState(50);
-  const [conversaciones, setConversaciones] = useState(10);
-  const [reuniones, setReuniones] = useState(1);
+  // Datos reales del usuario - sincronizados con el contexto
+  const [llamadasRealizadas, setLlamadasRealizadas] = useState(callMetrics.llamadasRealizadas);
+  const [contestadas, setContestadas] = useState(callMetrics.contestadas);
+  const [conversaciones, setConversaciones] = useState(callMetrics.conversaciones);
+  const [reuniones, setReuniones] = useState(callMetrics.reuniones);
+
+  // Sincronizar con el contexto cuando cambian los valores
+  useEffect(() => {
+    setCallMetrics({
+      llamadasRealizadas,
+      contestadas,
+      conversaciones,
+      reuniones,
+    });
+  }, [llamadasRealizadas, contestadas, conversaciones, reuniones, setCallMetrics]);
 
   // Cálculo de tasas de conversión
   const tasas = useMemo(() => {

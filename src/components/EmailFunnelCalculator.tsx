@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useFunnelMetrics } from "@/contexts/FunnelMetricsContext";
 import { Mail, MailOpen, MessageCircle, Calendar, TrendingUp, TrendingDown, Minus, ChevronDown, ChevronUp, Lightbulb, Wrench, BookOpen, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,14 +38,25 @@ type TimePeriod = 'daily' | 'weekly' | 'monthly';
 
 const EmailFunnelCalculator = () => {
   const { language } = useLanguage();
+  const { emailMetrics, setEmailMetrics } = useFunnelMetrics();
   const [isExpanded, setIsExpanded] = useState(false);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
   
-  // Datos del usuario
-  const [emailsEnviados, setEmailsEnviados] = useState(500);
-  const [emailsAbiertos, setEmailsAbiertos] = useState(150);
-  const [emailsRespondidos, setEmailsRespondidos] = useState(15);
-  const [reuniones, setReuniones] = useState(5);
+  // Datos del usuario - sincronizados con el contexto
+  const [emailsEnviados, setEmailsEnviados] = useState(emailMetrics.emailsEnviados);
+  const [emailsAbiertos, setEmailsAbiertos] = useState(emailMetrics.emailsAbiertos);
+  const [emailsRespondidos, setEmailsRespondidos] = useState(emailMetrics.emailsRespondidos);
+  const [reuniones, setReuniones] = useState(emailMetrics.reuniones);
+
+  // Sincronizar con el contexto cuando cambian los valores
+  useEffect(() => {
+    setEmailMetrics({
+      emailsEnviados,
+      emailsAbiertos,
+      emailsRespondidos,
+      reuniones,
+    });
+  }, [emailsEnviados, emailsAbiertos, emailsRespondidos, reuniones, setEmailMetrics]);
 
   // Cálculo de tasas de conversión
   const tasas = useMemo(() => {
