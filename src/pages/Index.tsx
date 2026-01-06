@@ -9,6 +9,7 @@ import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
 import PipelineFilter from "@/components/PipelineFilter";
+import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -37,6 +38,9 @@ const Index = () => {
       
       {/* Prospect Funnel Calculator */}
       <ProspectFunnelCalculator />
+      
+      {/* Time Blocking Strategy */}
+      <TimeBlockingStrategy />
       
       {/* AI Agents Section */}
       <AIAgentsSection />
