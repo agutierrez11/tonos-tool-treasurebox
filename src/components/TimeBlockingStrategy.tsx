@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFunnelMetrics } from '@/contexts/FunnelMetricsContext';
 import { 
   Clock, 
   Download, 
@@ -15,11 +16,10 @@ import {
   Calendar,
   MessageSquare,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  Link2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 
@@ -36,61 +36,26 @@ interface TimeBlock {
   notesEn: string;
 }
 
-interface FunnelMetrics {
-  // Call Funnel
-  llamadasRealizadas: number;
-  contestadas: number;
-  conversacionesCall: number;
-  reunionesCall: number;
-  // Email Funnel
-  emailsEnviados: number;
-  emailsAbiertos: number;
-  emailsRespondidos: number;
-  reunionesEmail: number;
-  // Prospect Funnel
-  prospectosGenerados: number;
-  prospectosContactados: number;
-  reunionesGeneradas: number;
-  reunionesRealizadas: number;
-  ventas: number;
-}
-
 const TimeBlockingStrategy: React.FC = () => {
   const { language } = useLanguage();
+  const { callMetrics, emailMetrics, prospectMetrics } = useFunnelMetrics();
   const [isExpanded, setIsExpanded] = useState(false);
-  
-  // Input metrics from calculators
-  const [metrics, setMetrics] = useState<FunnelMetrics>({
-    llamadasRealizadas: 100,
-    contestadas: 50,
-    conversacionesCall: 10,
-    reunionesCall: 1,
-    emailsEnviados: 500,
-    emailsAbiertos: 150,
-    emailsRespondidos: 15,
-    reunionesEmail: 5,
-    prospectosGenerados: 500,
-    prospectosContactados: 100,
-    reunionesGeneradas: 50,
-    reunionesRealizadas: 35,
-    ventas: 5,
-  });
 
-  // Calculate conversion rates
+  // Calculate conversion rates from shared metrics
   const conversionRates = useMemo(() => {
     return {
-      callConnection: metrics.llamadasRealizadas > 0 ? (metrics.contestadas / metrics.llamadasRealizadas) * 100 : 0,
-      callConversation: metrics.contestadas > 0 ? (metrics.conversacionesCall / metrics.contestadas) * 100 : 0,
-      callMeeting: metrics.conversacionesCall > 0 ? (metrics.reunionesCall / metrics.conversacionesCall) * 100 : 0,
-      emailOpen: metrics.emailsEnviados > 0 ? (metrics.emailsAbiertos / metrics.emailsEnviados) * 100 : 0,
-      emailReply: metrics.emailsAbiertos > 0 ? (metrics.emailsRespondidos / metrics.emailsAbiertos) * 100 : 0,
-      emailMeeting: metrics.emailsRespondidos > 0 ? (metrics.reunionesEmail / metrics.emailsRespondidos) * 100 : 0,
-      prospectContact: metrics.prospectosGenerados > 0 ? (metrics.prospectosContactados / metrics.prospectosGenerados) * 100 : 0,
-      prospectMeeting: metrics.prospectosContactados > 0 ? (metrics.reunionesGeneradas / metrics.prospectosContactados) * 100 : 0,
-      showRate: metrics.reunionesGeneradas > 0 ? (metrics.reunionesRealizadas / metrics.reunionesGeneradas) * 100 : 0,
-      closeRate: metrics.reunionesRealizadas > 0 ? (metrics.ventas / metrics.reunionesRealizadas) * 100 : 0,
+      callConnection: callMetrics.llamadasRealizadas > 0 ? (callMetrics.contestadas / callMetrics.llamadasRealizadas) * 100 : 0,
+      callConversation: callMetrics.contestadas > 0 ? (callMetrics.conversaciones / callMetrics.contestadas) * 100 : 0,
+      callMeeting: callMetrics.conversaciones > 0 ? (callMetrics.reuniones / callMetrics.conversaciones) * 100 : 0,
+      emailOpen: emailMetrics.emailsEnviados > 0 ? (emailMetrics.emailsAbiertos / emailMetrics.emailsEnviados) * 100 : 0,
+      emailReply: emailMetrics.emailsAbiertos > 0 ? (emailMetrics.emailsRespondidos / emailMetrics.emailsAbiertos) * 100 : 0,
+      emailMeeting: emailMetrics.emailsRespondidos > 0 ? (emailMetrics.reuniones / emailMetrics.emailsRespondidos) * 100 : 0,
+      prospectContact: prospectMetrics.prospectosGenerados > 0 ? (prospectMetrics.prospectosContactados / prospectMetrics.prospectosGenerados) * 100 : 0,
+      prospectMeeting: prospectMetrics.prospectosContactados > 0 ? (prospectMetrics.reunionesGeneradas / prospectMetrics.prospectosContactados) * 100 : 0,
+      showRate: prospectMetrics.reunionesGeneradas > 0 ? (prospectMetrics.reunionesRealizadas / prospectMetrics.reunionesGeneradas) * 100 : 0,
+      closeRate: prospectMetrics.reunionesRealizadas > 0 ? (prospectMetrics.ventas / prospectMetrics.reunionesRealizadas) * 100 : 0,
     };
-  }, [metrics]);
+  }, [callMetrics, emailMetrics, prospectMetrics]);
 
   // Generate time blocking strategy based on metrics
   const timeBlocks = useMemo((): TimeBlock[] => {
@@ -262,25 +227,25 @@ const TimeBlockingStrategy: React.FC = () => {
   const exportToExcel = () => {
     // Prepare calculator data
     const callFunnelData = [
-      { Metric: language === 'es' ? 'Llamadas Realizadas' : 'Calls Made', Value: metrics.llamadasRealizadas, ConversionRate: '-' },
-      { Metric: language === 'es' ? 'Contestadas' : 'Answered', Value: metrics.contestadas, ConversionRate: `${conversionRates.callConnection.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Conversaciones' : 'Conversations', Value: metrics.conversacionesCall, ConversionRate: `${conversionRates.callConversation.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Reuniones' : 'Meetings', Value: metrics.reunionesCall, ConversionRate: `${conversionRates.callMeeting.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Llamadas Realizadas' : 'Calls Made', Value: callMetrics.llamadasRealizadas, ConversionRate: '-' },
+      { Metric: language === 'es' ? 'Contestadas' : 'Answered', Value: callMetrics.contestadas, ConversionRate: `${conversionRates.callConnection.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Conversaciones' : 'Conversations', Value: callMetrics.conversaciones, ConversionRate: `${conversionRates.callConversation.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Reuniones' : 'Meetings', Value: callMetrics.reuniones, ConversionRate: `${conversionRates.callMeeting.toFixed(1)}%` },
     ];
 
     const emailFunnelData = [
-      { Metric: language === 'es' ? 'Emails Enviados' : 'Emails Sent', Value: metrics.emailsEnviados, ConversionRate: '-' },
-      { Metric: language === 'es' ? 'Abiertos' : 'Opened', Value: metrics.emailsAbiertos, ConversionRate: `${conversionRates.emailOpen.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Respondidos' : 'Replied', Value: metrics.emailsRespondidos, ConversionRate: `${conversionRates.emailReply.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Reuniones' : 'Meetings', Value: metrics.reunionesEmail, ConversionRate: `${conversionRates.emailMeeting.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Emails Enviados' : 'Emails Sent', Value: emailMetrics.emailsEnviados, ConversionRate: '-' },
+      { Metric: language === 'es' ? 'Abiertos' : 'Opened', Value: emailMetrics.emailsAbiertos, ConversionRate: `${conversionRates.emailOpen.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Respondidos' : 'Replied', Value: emailMetrics.emailsRespondidos, ConversionRate: `${conversionRates.emailReply.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Reuniones' : 'Meetings', Value: emailMetrics.reuniones, ConversionRate: `${conversionRates.emailMeeting.toFixed(1)}%` },
     ];
 
     const prospectFunnelData = [
-      { Metric: language === 'es' ? 'Prospectos Generados' : 'Prospects Generated', Value: metrics.prospectosGenerados, ConversionRate: '-' },
-      { Metric: language === 'es' ? 'Prospectos Contactados' : 'Prospects Contacted', Value: metrics.prospectosContactados, ConversionRate: `${conversionRates.prospectContact.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Reuniones Generadas' : 'Meetings Generated', Value: metrics.reunionesGeneradas, ConversionRate: `${conversionRates.prospectMeeting.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Reuniones Realizadas' : 'Meetings Held', Value: metrics.reunionesRealizadas, ConversionRate: `${conversionRates.showRate.toFixed(1)}%` },
-      { Metric: language === 'es' ? 'Ventas' : 'Sales', Value: metrics.ventas, ConversionRate: `${conversionRates.closeRate.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Prospectos Generados' : 'Prospects Generated', Value: prospectMetrics.prospectosGenerados, ConversionRate: '-' },
+      { Metric: language === 'es' ? 'Prospectos Contactados' : 'Prospects Contacted', Value: prospectMetrics.prospectosContactados, ConversionRate: `${conversionRates.prospectContact.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Reuniones Generadas' : 'Meetings Generated', Value: prospectMetrics.reunionesGeneradas, ConversionRate: `${conversionRates.prospectMeeting.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Reuniones Realizadas' : 'Meetings Held', Value: prospectMetrics.reunionesRealizadas, ConversionRate: `${conversionRates.showRate.toFixed(1)}%` },
+      { Metric: language === 'es' ? 'Ventas' : 'Sales', Value: prospectMetrics.ventas, ConversionRate: `${conversionRates.closeRate.toFixed(1)}%` },
     ];
 
     const timeBlockData = timeBlocks.map(block => ({
@@ -440,22 +405,11 @@ const TimeBlockingStrategy: React.FC = () => {
       subtitle: 'Optimiza tu tiempo basado en tus métricas de ventas',
       showCalculator: 'Mostrar Estrategia',
       hideCalculator: 'Ocultar Estrategia',
-      yourMetrics: 'Tus Métricas',
+      metricsLinked: 'Métricas Sincronizadas',
+      metricsLinkedDesc: 'Los datos se toman automáticamente de las calculadoras de arriba',
       callFunnel: 'Funnel de Llamadas',
       emailFunnel: 'Funnel de Emails',
       prospectFunnel: 'Funnel de Prospectos',
-      calls: 'Llamadas',
-      answered: 'Contestadas',
-      conversations: 'Conversaciones',
-      meetings: 'Reuniones',
-      emailsSent: 'Emails Enviados',
-      opened: 'Abiertos',
-      replied: 'Respondidos',
-      prospects: 'Prospectos',
-      contacted: 'Contactados',
-      generated: 'Generadas',
-      held: 'Realizadas',
-      sales: 'Ventas',
       yourSchedule: 'Tu Horario Optimizado',
       recommendations: 'Recomendaciones',
       exportExcel: 'Exportar a Excel',
@@ -464,28 +418,21 @@ const TimeBlockingStrategy: React.FC = () => {
       high: 'Alta',
       medium: 'Media',
       low: 'Baja',
+      connectionRate: 'Tasa Conexión',
+      openRate: 'Tasa Apertura',
+      showRate: 'Show Rate',
+      closeRate: 'Tasa Cierre',
     },
     en: {
       title: 'Time Blocking Strategy',
       subtitle: 'Optimize your time based on your sales metrics',
       showCalculator: 'Show Strategy',
       hideCalculator: 'Hide Strategy',
-      yourMetrics: 'Your Metrics',
+      metricsLinked: 'Synced Metrics',
+      metricsLinkedDesc: 'Data is automatically taken from the calculators above',
       callFunnel: 'Call Funnel',
       emailFunnel: 'Email Funnel',
       prospectFunnel: 'Prospect Funnel',
-      calls: 'Calls',
-      answered: 'Answered',
-      conversations: 'Conversations',
-      meetings: 'Meetings',
-      emailsSent: 'Emails Sent',
-      opened: 'Opened',
-      replied: 'Replied',
-      prospects: 'Prospects',
-      contacted: 'Contacted',
-      generated: 'Generated',
-      held: 'Held',
-      sales: 'Sales',
       yourSchedule: 'Your Optimized Schedule',
       recommendations: 'Recommendations',
       exportExcel: 'Export to Excel',
@@ -494,14 +441,14 @@ const TimeBlockingStrategy: React.FC = () => {
       high: 'High',
       medium: 'Medium',
       low: 'Low',
+      connectionRate: 'Connection Rate',
+      openRate: 'Open Rate',
+      showRate: 'Show Rate',
+      closeRate: 'Close Rate',
     },
   };
 
   const t = texts[language];
-
-  const handleMetricChange = (field: keyof FunnelMetrics, value: number) => {
-    setMetrics(prev => ({ ...prev, [field]: value }));
-  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -559,94 +506,42 @@ const TimeBlockingStrategy: React.FC = () => {
             </Button>
           </div>
 
-          {/* Metrics Input */}
-          <div className="space-y-6">
-            <h3 className="font-semibold text-lg flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              {t.yourMetrics}
-            </h3>
+          {/* Synced Metrics Summary */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800">
+            <div className="flex items-center gap-2 mb-3">
+              <Link2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="font-semibold text-indigo-700 dark:text-indigo-300">{t.metricsLinked}</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">{t.metricsLinkedDesc}</p>
             
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Call Funnel */}
-              <div className="bg-card p-4 rounded-xl border border-border space-y-3">
-                <h4 className="font-medium flex items-center gap-2 text-blue-600 dark:text-blue-400">
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="bg-card p-3 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
                   <Phone className="w-4 h-4" />
-                  {t.callFunnel}
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.calls}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.llamadasRealizadas} onChange={(e) => handleMetricChange('llamadasRealizadas', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.answered}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.contestadas} onChange={(e) => handleMetricChange('contestadas', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.conversations}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.conversacionesCall} onChange={(e) => handleMetricChange('conversacionesCall', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.meetings}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.reunionesCall} onChange={(e) => handleMetricChange('reunionesCall', Number(e.target.value))} />
-                  </div>
+                  <span className="text-xs font-medium">{t.connectionRate}</span>
                 </div>
+                <span className="text-xl font-bold">{conversionRates.callConnection.toFixed(1)}%</span>
               </div>
-
-              {/* Email Funnel */}
-              <div className="bg-card p-4 rounded-xl border border-border space-y-3">
-                <h4 className="font-medium flex items-center gap-2 text-purple-600 dark:text-purple-400">
+              <div className="bg-card p-3 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 mb-1">
                   <Mail className="w-4 h-4" />
-                  {t.emailFunnel}
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.emailsSent}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.emailsEnviados} onChange={(e) => handleMetricChange('emailsEnviados', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.opened}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.emailsAbiertos} onChange={(e) => handleMetricChange('emailsAbiertos', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.replied}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.emailsRespondidos} onChange={(e) => handleMetricChange('emailsRespondidos', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.meetings}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.reunionesEmail} onChange={(e) => handleMetricChange('reunionesEmail', Number(e.target.value))} />
-                  </div>
+                  <span className="text-xs font-medium">{t.openRate}</span>
                 </div>
+                <span className="text-xl font-bold">{conversionRates.emailOpen.toFixed(1)}%</span>
               </div>
-
-              {/* Prospect Funnel */}
-              <div className="bg-card p-4 rounded-xl border border-border space-y-3">
-                <h4 className="font-medium flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                  <Users className="w-4 h-4" />
-                  {t.prospectFunnel}
-                </h4>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.prospects}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.prospectosGenerados} onChange={(e) => handleMetricChange('prospectosGenerados', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.contacted}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.prospectosContactados} onChange={(e) => handleMetricChange('prospectosContactados', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.generated}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.reunionesGeneradas} onChange={(e) => handleMetricChange('reunionesGeneradas', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.held}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.reunionesRealizadas} onChange={(e) => handleMetricChange('reunionesRealizadas', Number(e.target.value))} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{t.sales}</Label>
-                    <Input type="number" className="w-20 h-8 text-sm" value={metrics.ventas} onChange={(e) => handleMetricChange('ventas', Number(e.target.value))} />
-                  </div>
+              <div className="bg-card p-3 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 mb-1">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-xs font-medium">{t.showRate}</span>
                 </div>
+                <span className="text-xl font-bold">{conversionRates.showRate.toFixed(1)}%</span>
+              </div>
+              <div className="bg-card p-3 rounded-lg border border-border">
+                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-1">
+                  <Target className="w-4 h-4" />
+                  <span className="text-xs font-medium">{t.closeRate}</span>
+                </div>
+                <span className="text-xl font-bold">{conversionRates.closeRate.toFixed(1)}%</span>
               </div>
             </div>
           </div>

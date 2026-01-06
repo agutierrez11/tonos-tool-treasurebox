@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Users, Phone, Calendar, CheckCircle2, Target, Info, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, AlertTriangle, Lightbulb, Wrench, BookOpen, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useFunnelMetrics } from '@/contexts/FunnelMetricsContext';
 
 const FUNNEL_COLORS = {
   prospectosGenerados: 'hsl(220, 15%, 50%)',
@@ -34,16 +35,29 @@ type TimePeriod = 'daily' | 'weekly' | 'monthly';
 
 const ProspectFunnelCalculator: React.FC = () => {
   const { language } = useLanguage();
+  const { prospectMetrics, setProspectMetrics } = useFunnelMetrics();
   const [isExpanded, setIsExpanded] = useState(false);
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('monthly');
   
-  // Datos reales del usuario (basado en el Excel)
-  const [prospectosGenerados, setProspectosGenerados] = useState(500);
-  const [prospectosContactados, setProspectosContactados] = useState(100);
-  const [reunionesGeneradas, setReunionesGeneradas] = useState(50);
-  const [reunionesRealizadas, setReunionesRealizadas] = useState(35);
-  const [ventas, setVentas] = useState(5);
-  const [ticketPromedio, setTicketPromedio] = useState(15000);
+  // Datos reales del usuario - sincronizados con el contexto
+  const [prospectosGenerados, setProspectosGenerados] = useState(prospectMetrics.prospectosGenerados);
+  const [prospectosContactados, setProspectosContactados] = useState(prospectMetrics.prospectosContactados);
+  const [reunionesGeneradas, setReunionesGeneradas] = useState(prospectMetrics.reunionesGeneradas);
+  const [reunionesRealizadas, setReunionesRealizadas] = useState(prospectMetrics.reunionesRealizadas);
+  const [ventas, setVentas] = useState(prospectMetrics.ventas);
+  const [ticketPromedio, setTicketPromedio] = useState(prospectMetrics.ticketPromedio);
+
+  // Sincronizar con el contexto cuando cambian los valores
+  useEffect(() => {
+    setProspectMetrics({
+      prospectosGenerados,
+      prospectosContactados,
+      reunionesGeneradas,
+      reunionesRealizadas,
+      ventas,
+      ticketPromedio,
+    });
+  }, [prospectosGenerados, prospectosContactados, reunionesGeneradas, reunionesRealizadas, ventas, ticketPromedio, setProspectMetrics]);
 
   // Cálculo de tasas de conversión
   const tasas = useMemo(() => {
