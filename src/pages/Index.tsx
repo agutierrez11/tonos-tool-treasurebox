@@ -10,7 +10,7 @@ import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
 import PipelineFilter from "@/components/PipelineFilter";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
-import LeadsPreview from "@/components/LeadsPreview";
+import NoCounter from "@/components/NoCounter";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -28,8 +28,8 @@ const Index = () => {
       
       <Header />
       
-      {/* Leads Dashboard Access */}
-      <LeadsPreview />
+      {/* NO → YES Counter - Most visible at top */}
+      <NoCounter />
       
       {/* Sales Calculator */}
       <SalesCalculator />
