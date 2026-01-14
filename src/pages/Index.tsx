@@ -10,6 +10,7 @@ import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
 import PipelineFilter from "@/components/PipelineFilter";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
+import CRMDashboard from "@/components/CRMDashboard";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -47,6 +48,9 @@ const Index = () => {
       
       {/* Pipeline Filter */}
       <PipelineFilter />
+      
+      {/* CRM Dashboard */}
+      <CRMDashboard />
       
       <CategoryNav />
       
