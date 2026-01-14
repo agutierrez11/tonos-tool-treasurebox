@@ -10,6 +10,7 @@ import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
 import PipelineFilter from "@/components/PipelineFilter";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
+import LeadsPreview from "@/components/LeadsPreview";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -26,6 +27,9 @@ const Index = () => {
       </title>
       
       <Header />
+      
+      {/* Leads Dashboard Access */}
+      <LeadsPreview />
       
       {/* Sales Calculator */}
       <SalesCalculator />
