@@ -399,6 +399,51 @@ const TimeBlockingStrategy: React.FC = () => {
     doc.save(`time-blocking-strategy-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
+  // Generate calendar links for time blocks
+  const generateGoogleCalendarUrl = (block: TimeBlock) => {
+    const today = new Date();
+    const [startHour, startMin] = block.startTime.split(':').map(Number);
+    const [endHour, endMin] = block.endTime.split(':').map(Number);
+    
+    const startDate = new Date(today);
+    startDate.setHours(startHour, startMin, 0, 0);
+    
+    const endDate = new Date(today);
+    endDate.setHours(endHour, endMin, 0, 0);
+    
+    const formatDate = (date: Date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const title = encodeURIComponent(language === 'es' ? block.activity : block.activityEn);
+    const details = encodeURIComponent(language === 'es' ? block.notes : block.notesEn);
+    
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${details}`;
+  };
+
+  const generateOutlookUrl = (block: TimeBlock) => {
+    const today = new Date();
+    const [startHour, startMin] = block.startTime.split(':').map(Number);
+    const [endHour, endMin] = block.endTime.split(':').map(Number);
+    
+    const startDate = new Date(today);
+    startDate.setHours(startHour, startMin, 0, 0);
+    
+    const endDate = new Date(today);
+    endDate.setHours(endHour, endMin, 0, 0);
+    
+    const title = encodeURIComponent(language === 'es' ? block.activity : block.activityEn);
+    const body = encodeURIComponent(language === 'es' ? block.notes : block.notesEn);
+    
+    return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}&body=${body}`;
+  };
+
+  const addAllToGoogleCalendar = () => {
+    timeBlocks.forEach((block, index) => {
+      setTimeout(() => {
+        window.open(generateGoogleCalendarUrl(block), '_blank');
+      }, index * 500);
+    });
+  };
+
   const texts = {
     es: {
       title: 'Estrategia de Time Blocking',
@@ -422,6 +467,10 @@ const TimeBlockingStrategy: React.FC = () => {
       openRate: 'Tasa Apertura',
       showRate: 'Show Rate',
       closeRate: 'Tasa Cierre',
+      addToCalendar: 'Agregar a Calendario',
+      googleCalendar: 'Google Calendar',
+      outlook: 'Outlook',
+      addAll: 'Agregar todos',
     },
     en: {
       title: 'Time Blocking Strategy',
@@ -445,6 +494,10 @@ const TimeBlockingStrategy: React.FC = () => {
       openRate: 'Open Rate',
       showRate: 'Show Rate',
       closeRate: 'Close Rate',
+      addToCalendar: 'Add to Calendar',
+      googleCalendar: 'Google Calendar',
+      outlook: 'Outlook',
+      addAll: 'Add all',
     },
   };
 
@@ -494,15 +547,22 @@ const TimeBlockingStrategy: React.FC = () => {
       {/* Content */}
       {isExpanded && (
         <div className="mt-6 glass-effect rounded-xl p-4 sm:p-6 space-y-8">
-          {/* Export Buttons */}
+          {/* Export & Calendar Buttons */}
           <div className="flex flex-wrap gap-3 justify-end">
             <Button onClick={exportToExcel} variant="outline" className="gap-2">
               <FileSpreadsheet className="w-4 h-4" />
               {t.exportExcel}
             </Button>
-            <Button onClick={exportToPDF} className="gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700">
+            <Button onClick={exportToPDF} variant="outline" className="gap-2">
               <FileText className="w-4 h-4" />
               {t.exportPDF}
+            </Button>
+            <Button 
+              onClick={addAllToGoogleCalendar} 
+              className="gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+            >
+              <Calendar className="w-4 h-4" />
+              {t.googleCalendar} ({t.addAll})
             </Button>
           </div>
 
@@ -580,6 +640,27 @@ const TimeBlockingStrategy: React.FC = () => {
                     <p className="text-sm text-muted-foreground truncate">
                       {language === 'es' ? block.notes : block.notesEn}
                     </p>
+                  </div>
+                  {/* Calendar buttons for each block */}
+                  <div className="flex gap-2 shrink-0">
+                    <a
+                      href={generateGoogleCalendarUrl(block)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors"
+                      title="Google Calendar"
+                    >
+                      <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </a>
+                    <a
+                      href={generateOutlookUrl(block)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-900/30 dark:hover:bg-cyan-900/50 transition-colors"
+                      title="Outlook"
+                    >
+                      <Mail className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                    </a>
                   </div>
                 </div>
               ))}
