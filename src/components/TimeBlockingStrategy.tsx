@@ -275,112 +275,151 @@ const TimeBlockingStrategy: React.FC = () => {
     XLSX.writeFile(wb, `sales-funnel-metrics-${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
-  // Export to PDF
+  // Get category colors for calendar view
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'prospecting': return { bg: '#f97316', text: '#ffffff' }; // Orange
+      case 'calls': return { bg: '#f97316', text: '#ffffff' }; // Orange
+      case 'emails': return { bg: '#eab308', text: '#000000' }; // Yellow
+      case 'meetings': return { bg: '#f97316', text: '#ffffff' }; // Orange
+      case 'admin': return { bg: '#eab308', text: '#000000' }; // Yellow
+      case 'break': return { bg: '#ec4899', text: '#ffffff' }; // Pink/Magenta
+      default: return { bg: '#6b7280', text: '#ffffff' };
+    }
+  };
+
+  // Get week days starting from today
+  const getWeekDays = () => {
+    const days = [];
+    const today = new Date();
+    const dayNames = language === 'es' 
+      ? ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB']
+      : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      days.push({
+        name: dayNames[date.getDay()],
+        date: date.getDate(),
+        fullDate: date,
+      });
+    }
+    return days;
+  };
+
+  const weekDays = getWeekDays();
+  const timeSlots = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM'];
+
+  // Export to PDF with weekly calendar format
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape');
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
     
     // Title
-    doc.setFontSize(20);
+    doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text(language === 'es' ? 'Estrategia de Time Blocking' : 'Time Blocking Strategy', pageWidth / 2, 20, { align: 'center' });
+    doc.text(language === 'es' ? 'Estrategia de Time Blocking - Vista Semanal' : 'Time Blocking Strategy - Weekly View', pageWidth / 2, 15, { align: 'center' });
     
-    // Date
+    // Week range
+    const startDate = weekDays[0].fullDate;
+    const endDate = weekDays[4].fullDate;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`${language === 'es' ? 'Fecha' : 'Date'}: ${new Date().toLocaleDateString()}`, pageWidth / 2, 28, { align: 'center' });
+    doc.text(`${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, pageWidth / 2, 22, { align: 'center' });
 
-    // Subtitle
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'italic');
-    doc.text(language === 'es' 
-      ? 'Horario optimizado basado en tus métricas de ventas'
-      : 'Optimized schedule based on your sales metrics', pageWidth / 2, 36, { align: 'center' });
+    // Calendar grid
+    const gridStartX = 25;
+    const gridStartY = 30;
+    const dayWidth = (pageWidth - 50) / 5;
+    const hourHeight = 18;
+    const headerHeight = 15;
 
-    let yPos = 50;
-
-    // Time blocks table
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(language === 'es' ? 'Tu Horario Diario' : 'Your Daily Schedule', 14, yPos);
-    yPos += 10;
-
-    // Table header
+    // Draw day headers
+    doc.setFillColor(245, 245, 245);
+    doc.rect(gridStartX, gridStartY, pageWidth - 50, headerHeight, 'F');
+    
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.setFillColor(59, 130, 246);
-    doc.rect(14, yPos, pageWidth - 28, 8, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.text(language === 'es' ? 'Hora' : 'Time', 16, yPos + 6);
-    doc.text(language === 'es' ? 'Actividad' : 'Activity', 50, yPos + 6);
-    doc.text(language === 'es' ? 'Prioridad' : 'Priority', 140, yPos + 6);
-    yPos += 10;
+    weekDays.forEach((day, index) => {
+      const x = gridStartX + (index * dayWidth) + (dayWidth / 2);
+      doc.text(day.name, x, gridStartY + 6, { align: 'center' });
+      doc.setFontSize(14);
+      doc.text(String(day.date), x, gridStartY + 13, { align: 'center' });
+      doc.setFontSize(10);
+    });
 
-    // Table rows
+    // Draw time slots and grid
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(0, 0, 0);
+    doc.setDrawColor(220, 220, 220);
     
-    timeBlocks.forEach((block, index) => {
-      const bgColor = index % 2 === 0 ? 245 : 255;
-      doc.setFillColor(bgColor, bgColor, bgColor);
-      doc.rect(14, yPos, pageWidth - 28, 12, 'F');
+    timeSlots.forEach((time, index) => {
+      const y = gridStartY + headerHeight + (index * hourHeight);
       
-      doc.text(`${block.startTime} - ${block.endTime}`, 16, yPos + 8);
-      doc.text(language === 'es' ? block.activity : block.activityEn, 50, yPos + 8);
+      // Time label
+      doc.setTextColor(128, 128, 128);
+      doc.text(time, 5, y + 10);
       
-      // Priority color
-      if (block.priority === 'high') {
-        doc.setTextColor(220, 38, 38);
-        doc.text(language === 'es' ? 'ALTA' : 'HIGH', 140, yPos + 8);
-      } else if (block.priority === 'medium') {
-        doc.setTextColor(234, 179, 8);
-        doc.text(language === 'es' ? 'MEDIA' : 'MEDIUM', 140, yPos + 8);
-      } else {
-        doc.setTextColor(34, 197, 94);
-        doc.text(language === 'es' ? 'BAJA' : 'LOW', 140, yPos + 8);
+      // Horizontal line
+      doc.line(gridStartX, y, pageWidth - 25, y);
+      
+      // Vertical lines for each day
+      for (let i = 0; i <= 5; i++) {
+        doc.line(gridStartX + (i * dayWidth), y, gridStartX + (i * dayWidth), y + hourHeight);
       }
-      doc.setTextColor(0, 0, 0);
-      
-      yPos += 12;
     });
-
-    yPos += 15;
-
-    // Recommendations
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(language === 'es' ? 'Recomendaciones Personalizadas' : 'Personalized Recommendations', 14, yPos);
-    yPos += 10;
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    recommendations.forEach((rec) => {
-      const text = language === 'es' ? rec.es : rec.en;
-      const splitText = doc.splitTextToSize(text, pageWidth - 28);
-      doc.text(splitText, 14, yPos);
-      yPos += splitText.length * 5 + 5;
-    });
-
-    yPos += 10;
-
-    // Key metrics summary
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(language === 'es' ? 'Resumen de Métricas Clave' : 'Key Metrics Summary', 14, yPos);
-    yPos += 10;
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    const metricsText = [
-      `${language === 'es' ? 'Tasa de Conexión Telefónica' : 'Phone Connection Rate'}: ${conversionRates.callConnection.toFixed(1)}%`,
-      `${language === 'es' ? 'Tasa de Apertura de Emails' : 'Email Open Rate'}: ${conversionRates.emailOpen.toFixed(1)}%`,
-      `${language === 'es' ? 'Show Rate' : 'Show Rate'}: ${conversionRates.showRate.toFixed(1)}%`,
-      `${language === 'es' ? 'Tasa de Cierre' : 'Close Rate'}: ${conversionRates.closeRate.toFixed(1)}%`,
-    ];
     
-    metricsText.forEach(text => {
-      doc.text(text, 14, yPos);
-      yPos += 6;
+    // Last horizontal line
+    const lastY = gridStartY + headerHeight + (timeSlots.length * hourHeight);
+    doc.line(gridStartX, lastY, pageWidth - 25, lastY);
+
+    // Draw time blocks on each day
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    
+    weekDays.forEach((day, dayIndex) => {
+      timeBlocks.forEach((block) => {
+        const startHour = parseInt(block.startTime.split(':')[0]);
+        const endHour = parseInt(block.endTime.split(':')[0]);
+        const duration = endHour - startHour;
+        
+        const x = gridStartX + (dayIndex * dayWidth) + 2;
+        const y = gridStartY + headerHeight + ((startHour - 8) * hourHeight) + 2;
+        const width = dayWidth - 4;
+        const height = (duration * hourHeight) - 4;
+        
+        const colors = getCategoryColor(block.category);
+        
+        // Parse hex color to RGB
+        const hexToRgb = (hex: string) => {
+          const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+          return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+          } : { r: 0, g: 0, b: 0 };
+        };
+        
+        const bgRgb = hexToRgb(colors.bg);
+        const textRgb = hexToRgb(colors.text);
+        
+        // Draw block
+        doc.setFillColor(bgRgb.r, bgRgb.g, bgRgb.b);
+        doc.roundedRect(x, y, width, height, 2, 2, 'F');
+        
+        // Block text
+        doc.setTextColor(textRgb.r, textRgb.g, textRgb.b);
+        doc.setFont('helvetica', 'bold');
+        
+        const activityText = language === 'es' ? block.activity : block.activityEn;
+        const shortActivity = activityText.length > 15 ? activityText.substring(0, 15) + '...' : activityText;
+        
+        doc.text(shortActivity, x + 3, y + 8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${block.startTime} - ${block.endTime}`, x + 3, y + 14);
+      });
     });
 
     // Footer
@@ -391,12 +430,12 @@ const TimeBlockingStrategy: React.FC = () => {
       ? 'Generado por Digital Tools - Hecho con el Corazón, de vendedor a vendedor'
       : 'Generated by Digital Tools - Made with Heart, from seller to seller', 
       pageWidth / 2, 
-      doc.internal.pageSize.getHeight() - 10, 
+      pageHeight - 8, 
       { align: 'center' }
     );
 
     // Save PDF
-    doc.save(`time-blocking-strategy-${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(`time-blocking-weekly-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   // Generate calendar links for time blocks
@@ -606,65 +645,109 @@ const TimeBlockingStrategy: React.FC = () => {
             </div>
           </div>
 
-          {/* Time Blocks Schedule */}
+          {/* Weekly Calendar View */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               {t.yourSchedule}
             </h3>
             
-            <div className="grid gap-3">
-              {timeBlocks.map((block, index) => (
-                <div 
-                  key={index}
-                  className="flex items-center gap-4 p-4 bg-card rounded-xl border border-border hover:shadow-md transition-shadow"
-                >
-                  <div 
-                    className="w-12 h-12 rounded-lg flex items-center justify-center text-white shrink-0"
-                    style={{ backgroundColor: block.color }}
-                  >
-                    {block.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold">
-                        {block.startTime} - {block.endTime}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(block.priority)}`}>
-                        {block.priority === 'high' ? t.high : block.priority === 'medium' ? t.medium : t.low}
-                      </span>
+            {/* Calendar Grid */}
+            <div className="overflow-x-auto">
+              <div className="min-w-[700px]">
+                {/* Header with days */}
+                <div className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-border">
+                  <div className="p-2 text-xs text-muted-foreground"></div>
+                  {weekDays.map((day, index) => (
+                    <div key={index} className="p-3 text-center border-l border-border bg-muted/30">
+                      <div className="text-xs text-muted-foreground font-medium">{day.name}</div>
+                      <div className="text-xl font-bold">{day.date}</div>
                     </div>
-                    <p className="font-medium text-foreground">
-                      {language === 'es' ? block.activity : block.activityEn}
-                    </p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {language === 'es' ? block.notes : block.notesEn}
-                    </p>
-                  </div>
-                  {/* Calendar buttons for each block */}
-                  <div className="flex gap-2 shrink-0">
-                    <a
-                      href={generateGoogleCalendarUrl(block)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors"
-                      title="Google Calendar"
-                    >
-                      <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    </a>
-                    <a
-                      href={generateOutlookUrl(block)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-cyan-100 hover:bg-cyan-200 dark:bg-cyan-900/30 dark:hover:bg-cyan-900/50 transition-colors"
-                      title="Outlook"
-                    >
-                      <Mail className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-                    </a>
-                  </div>
+                  ))}
                 </div>
-              ))}
+                
+                {/* Time slots grid */}
+                <div className="relative">
+                  {timeSlots.map((time, timeIndex) => (
+                    <div key={timeIndex} className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-border" style={{ height: '70px' }}>
+                      <div className="p-2 text-xs text-muted-foreground flex items-start justify-end pr-3">
+                        {time}
+                      </div>
+                      {weekDays.map((day, dayIndex) => {
+                        const slotHour = parseInt(time.split(' ')[0]) + (time.includes('PM') && !time.includes('12') ? 12 : 0);
+                        const blockInSlot = timeBlocks.find(block => {
+                          const blockHour = parseInt(block.startTime.split(':')[0]);
+                          return blockHour === slotHour || (slotHour === 12 && blockHour === 12);
+                        });
+                        
+                        if (blockInSlot) {
+                          const startHour = parseInt(blockInSlot.startTime.split(':')[0]);
+                          const endHour = parseInt(blockInSlot.endTime.split(':')[0]);
+                          const duration = endHour - startHour;
+                          const colors = getCategoryColor(blockInSlot.category);
+                          
+                          return (
+                            <div key={dayIndex} className="border-l border-border p-1 relative">
+                              <a
+                                href={generateGoogleCalendarUrl(blockInSlot)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block rounded-lg p-2 h-full cursor-pointer hover:opacity-90 transition-opacity"
+                                style={{ 
+                                  backgroundColor: colors.bg,
+                                  color: colors.text,
+                                  height: `${duration * 70 - 8}px`,
+                                }}
+                              >
+                                <div className="text-xs font-semibold truncate">
+                                  {language === 'es' 
+                                    ? blockInSlot.activity.split(' ').slice(0, 2).join(' ')
+                                    : blockInSlot.activityEn.split(' ').slice(0, 2).join(' ')}
+                                </div>
+                                <div className="text-xs opacity-90">
+                                  {blockInSlot.startTime} - {blockInSlot.endTime}
+                                </div>
+                              </a>
+                            </div>
+                          );
+                        }
+                        
+                        return <div key={dayIndex} className="border-l border-border"></div>;
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Legend */}
+            <div className="flex flex-wrap gap-4 pt-2">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f97316' }}></div>
+                <span className="text-sm text-muted-foreground">
+                  {language === 'es' ? 'Llamadas/Reuniones' : 'Calls/Meetings'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: '#eab308' }}></div>
+                <span className="text-sm text-muted-foreground">
+                  {language === 'es' ? 'Emails/Admin' : 'Emails/Admin'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded" style={{ backgroundColor: '#ec4899' }}></div>
+                <span className="text-sm text-muted-foreground">
+                  {language === 'es' ? 'Descanso' : 'Break'}
+                </span>
+              </div>
+            </div>
+
+            {/* Tip */}
+            <p className="text-xs text-muted-foreground">
+              💡 {language === 'es' 
+                ? 'Haz clic en cualquier bloque para agregarlo a Google Calendar' 
+                : 'Click on any block to add it to Google Calendar'}
+            </p>
           </div>
 
           {/* Recommendations */}
