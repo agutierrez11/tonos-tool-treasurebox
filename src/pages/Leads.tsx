@@ -1,13 +1,14 @@
 import { useMemo } from "react";
-import { BarChart3, Linkedin, Phone, Mail, Users, TrendingUp, Clock, Trash2, RefreshCw, Plus } from "lucide-react";
+import { BarChart3, Linkedin, Phone, Mail, Users, TrendingUp, Clock, Trash2, RefreshCw, Plus, Download } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { LeadChart } from "@/components/dashboard/LeadChart";
 import { ChannelMetrics } from "@/components/dashboard/ChannelMetrics";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { useLeadsStore, calculateConversionRates, calculateSalesCycleTimes } from "@/hooks/useLeadsStore";
+import { useLeadsStore, calculateConversionRates, calculateSalesCycleTimes, LeadChannel, LeadStatus } from "@/hooks/useLeadsStore";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +20,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+
+const channelLabels: Record<LeadChannel, string> = {
+  linkedin: "LinkedIn",
+  phone: "Teléfono",
+  email: "Email",
+};
+
+const statusLabels: Record<LeadStatus, string> = {
+  new: "Nuevo",
+  contacted: "Contactado",
+  qualified: "Calificado",
+  proposal: "Propuesta",
+  negotiation: "Negociación",
+  won: "Ganado",
+  lost: "Perdido",
+};
 
 const Leads = () => {
   const { leads, clearAllData, loadMockData, hasMockData } = useLeadsStore();
@@ -78,6 +95,39 @@ const Leads = () => {
     toast.success("Datos de ejemplo cargados");
   };
 
+  const handleExportToExcel = () => {
+    if (leads.length === 0) {
+      toast.error("No hay datos para exportar");
+      return;
+    }
+
+    const exportData = leads.map((lead) => ({
+      Nombre: lead.name,
+      Empresa: lead.company,
+      Email: lead.email,
+      Teléfono: lead.phone || "",
+      Canal: channelLabels[lead.channel],
+      Estado: statusLabels[lead.status],
+      "Valor ($)": lead.value,
+      "Fecha de creación": lead.date.toLocaleDateString("es-MX"),
+      "Fecha de cierre": lead.closedAt ? lead.closedAt.toLocaleDateString("es-MX") : "",
+      Notas: lead.notes || "",
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+
+    // Auto-size columns
+    const colWidths = Object.keys(exportData[0] || {}).map((key) => ({
+      wch: Math.max(key.length, 15),
+    }));
+    worksheet["!cols"] = colWidths;
+
+    XLSX.writeFile(workbook, `leads_${new Date().toISOString().split("T")[0]}.xlsx`);
+    toast.success("Archivo Excel exportado exitosamente");
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -90,7 +140,13 @@ const Leads = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {leads.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleExportToExcel} className="gap-2">
+                <Download className="h-4 w-4" />
+                Exportar Excel
+              </Button>
+            )}
             {leads.length > 0 && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
