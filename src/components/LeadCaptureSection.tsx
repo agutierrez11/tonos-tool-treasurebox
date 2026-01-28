@@ -61,16 +61,46 @@ const LeadCaptureSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simular envío para la vista previa
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitted(true);
-    toast({
-      title: t.successTitle,
-      description: t.successMessage,
-    });
-    
-    setIsSubmitting(false);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-lead`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            name: formData.name,
+            message: formData.message,
+            source: 'landing'
+          })
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Submission failed');
+      }
+
+      setIsSubmitted(true);
+      toast({
+        title: t.successTitle,
+        description: t.successMessage,
+      });
+    } catch (error) {
+      console.error('Lead submission error:', error);
+      toast({
+        title: language === 'es' ? 'Error' : 'Error',
+        description: language === 'es' 
+          ? 'No se pudo enviar el formulario. Inténtalo de nuevo.' 
+          : 'Could not submit the form. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
