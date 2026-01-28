@@ -5,6 +5,76 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+// Rate limiting
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 5; // Lower limit for expensive operations
+const RATE_WINDOW = 60 * 1000; // 1 minute
+
+function isRateLimited(clientId: string): boolean {
+  const now = Date.now();
+  const record = requestCounts.get(clientId);
+  
+  if (!record || now > record.resetTime) {
+    requestCounts.set(clientId, { count: 1, resetTime: now + RATE_WINDOW });
+    return false;
+  }
+  
+  if (record.count >= RATE_LIMIT) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+}
+
+// Input validation
+function validateInput(data: unknown): { valid: boolean; error?: string; category?: string; query?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { category, query } = data as { category?: unknown; query?: unknown };
+  
+  // At least one must be provided
+  if (!category && !query) {
+    return { valid: false, error: 'Category or query is required' };
+  }
+  
+  // Validate category
+  const validCategories = [
+    'email-marketing', 'email-tools', 'ai-writing', 'seo-analytics', 
+    'social-media', 'sales-crm', 'lead-generation', 'ai-tools', 
+    'design-media', 'education', 'productivity'
+  ];
+  
+  if (category !== undefined) {
+    if (typeof category !== 'string') {
+      return { valid: false, error: 'Category must be a string' };
+    }
+    if (!validCategories.includes(category)) {
+      return { valid: false, error: 'Invalid category' };
+    }
+  }
+  
+  // Validate query
+  if (query !== undefined) {
+    if (typeof query !== 'string') {
+      return { valid: false, error: 'Query must be a string' };
+    }
+    if (query.length > 200) {
+      return { valid: false, error: 'Query too long (max 200 chars)' };
+    }
+    // Basic sanitization - remove potential injection patterns
+    const sanitizedQuery = query.replace(/[<>{}]/g, '').trim();
+    if (sanitizedQuery.length < 2) {
+      return { valid: false, error: 'Query too short' };
+    }
+    return { valid: true, category: category as string | undefined, query: sanitizedQuery };
+  }
+  
+  return { valid: true, category: category as string | undefined, query: undefined };
+}
+
 interface DiscoveredTool {
   name: string;
   url: string;
@@ -18,7 +88,41 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { category, query } = await req.json();
+    // Get client identifier for rate limiting
+    const clientId = req.headers.get('x-forwarded-for') || 
+                     req.headers.get('x-real-ip') || 
+                     'anonymous';
+    
+    // Check rate limit (stricter for this expensive operation)
+    if (isRateLimited(clientId)) {
+      console.warn(`Rate limit exceeded for client: ${clientId}`);
+      return new Response(
+        JSON.stringify({ success: false, error: "Demasiadas búsquedas. Espera un momento." }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Parse and validate input
+    let requestData: unknown;
+    try {
+      requestData = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Invalid JSON' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.warn(`Input validation failed: ${validation.error}`);
+      return new Response(
+        JSON.stringify({ success: false, error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { category, query } = validation;
 
     const apiKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!apiKey) {
@@ -44,9 +148,9 @@ Deno.serve(async (req) => {
       'productivity': 'productivity project management tools',
     };
 
-    const searchQuery = query || searchQueries[category] || `best ${category} tools 2024 2025`;
+    const searchQuery = query || (category ? searchQueries[category] : '') || 'best marketing tools 2024 2025';
 
-    console.log('Searching for tools with query:', searchQuery);
+    console.log(`Discover tools - Query: ${searchQuery}, Client: ${clientId.slice(0, 8)}...`);
 
     // Use Firecrawl search to find relevant tools
     const searchResponse = await fetch('https://api.firecrawl.dev/v1/search', {
@@ -86,7 +190,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const resultsText = searchData.data?.map((r: any) => 
+    const resultsText = searchData.data?.map((r: { url?: string; title?: string; description?: string; markdown?: string }) => 
       `URL: ${r.url}\nTitle: ${r.title}\nDescription: ${r.description || ''}\nContent: ${(r.markdown || '').slice(0, 500)}`
     ).join('\n\n---\n\n') || '';
 
@@ -127,6 +231,20 @@ Return a JSON array of tools. Only include actual SaaS/tools, not articles or bl
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI error:', errorText);
+      
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Rate limit exceeded' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'AI credits exhausted' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ success: false, error: 'AI processing failed' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
