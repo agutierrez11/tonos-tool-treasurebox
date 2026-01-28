@@ -155,7 +155,11 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("Configuration error: AI API key is missing");
+      return new Response(
+        JSON.stringify({ error: "El servicio de IA no está disponible en este momento. Contacta al administrador." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     let systemPrompt = TOOLS_CONTEXT;
@@ -236,9 +240,12 @@ Explica pros y contras de cada opción.`;
       headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
-    console.error("AI Chat error:", error);
+    // Log detailed error internally for debugging
+    console.error("AI Chat error:", error instanceof Error ? error.message : error);
+    
+    // Return generic error message to client (never expose internal details)
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Error desconocido" }),
+      JSON.stringify({ error: "Ha ocurrido un error procesando tu solicitud. Intenta de nuevo." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
