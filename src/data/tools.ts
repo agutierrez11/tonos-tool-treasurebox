@@ -39,6 +39,8 @@ export const categories: Category[] = [
   { id: "lead-generation", name: { es: "Generación de Leads", en: "Lead Generation" }, icon: "Users", color: "from-teal-500 to-cyan-500" },
   { id: "ai-tools", name: { es: "Herramientas de IA", en: "AI Tools" }, icon: "Sparkles", color: "from-purple-500 to-indigo-500" },
   { id: "design-media", name: { es: "Diseño y Multimedia", en: "Design & Media" }, icon: "Image", color: "from-rose-500 to-orange-500" },
+  { id: "webinars-video", name: { es: "Webinars y Video", en: "Webinars & Video" }, icon: "Video", color: "from-red-500 to-pink-500" },
+  { id: "integrations", name: { es: "Integraciones", en: "Integrations" }, icon: "Zap", color: "from-amber-500 to-yellow-500" },
   { id: "education", name: { es: "Educación y Cursos", en: "Education & Courses" }, icon: "GraduationCap", color: "from-blue-500 to-indigo-500" },
   { id: "productivity", name: { es: "Productividad", en: "Productivity" }, icon: "Zap", color: "from-yellow-500 to-orange-500" },
 ];
@@ -176,6 +178,36 @@ export const tools: Tool[] = [
   // Productivity - Various stages
   { id: "venturekit", name: "VentureKit", description: { es: "Business plans con IA", en: "AI business plans" }, url: "https://www.venturekit.ai/", icon: "Briefcase", categoryId: "productivity", needs: ["content", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
   { id: "mastitulares", name: "Más Titulares", description: { es: "Generador de titulares", en: "Headline generator" }, url: "https://mastitulares.conviertemas.com/", icon: "Type", categoryId: "productivity", needs: ["content"], levels: ["beginner", "junior"], pricing: "free", funnelStage: "tofu" },
+
+  // NEW - From Salesflare article: Lead Data Finders
+  { id: "adaptio", name: "Adapt.io", description: { es: "Buscador de datos B2B por sector y empresa", en: "B2B data finder by industry and company" }, url: "https://www.adapt.io/", icon: "Database", categoryId: "lead-generation", needs: ["prospecting"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
+  { id: "salesflare", name: "Salesflare", description: { es: "CRM inteligente con buscador de emails integrado", en: "Smart CRM with built-in email finder" }, url: "https://salesflare.com/es", icon: "Sparkles", categoryId: "sales-crm", needs: ["automation", "prospecting", "analytics"], levels: ["beginner", "junior", "senior"], pricing: "freemium", funnelStage: "allinone" },
+  { id: "findthatlead", name: "FindThatLead", description: { es: "Encuentra emails con barra lateral de LinkedIn", en: "Find emails with LinkedIn sidebar" }, url: "https://findthatlead.com/", icon: "Search", categoryId: "lead-generation", needs: ["prospecting"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "tofu" },
+  { id: "myemailverifier", name: "MyEmailVerifier", description: { es: "Verificador de listas de emails asequible", en: "Affordable email list verifier" }, url: "https://myemailverifier.com/", icon: "CheckCircle", categoryId: "email-tools", needs: ["prospecting"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "tofu" },
+  { id: "snovio", name: "Snov.io", description: { es: "Buscador de emails con extensión LinkedIn", en: "Email finder with LinkedIn extension" }, url: "https://snov.io/", icon: "Search", categoryId: "lead-generation", needs: ["prospecting", "automation"], levels: ["junior", "senior"], pricing: "freemium", funnelStage: "tofu" },
+
+  // NEW - LinkedIn Automation
+  { id: "duxsoup", name: "Dux-Soup", description: { es: "Automatización de LinkedIn: conexiones y mensajes", en: "LinkedIn automation: connections and messages" }, url: "https://www.dux-soup.com/", icon: "Bot", categoryId: "social-media", needs: ["automation", "prospecting"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
+
+  // NEW - Calling Software
+  { id: "ringcentral", name: "RingCentral", description: { es: "Software VOIP para llamadas desde ordenador", en: "VOIP software for computer calls" }, url: "https://www.ringcentral.com/", icon: "Phone", categoryId: "sales-crm", needs: ["automation"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+
+  // NEW - Video Sales Tools
+  { id: "bonjoro", name: "Bonjoro", description: { es: "Videos personalizados para prospectos", en: "Personalized videos for prospects" }, url: "https://www.bonjoro.com/", icon: "Video", categoryId: "webinars-video", needs: ["content", "prospecting"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "mofu" },
+  { id: "zoom", name: "Zoom", description: { es: "Videollamadas y webinars", en: "Video calls and webinars" }, url: "https://zoom.us/", icon: "Video", categoryId: "webinars-video", needs: ["automation"], levels: ["beginner", "junior", "senior"], pricing: "freemium", funnelStage: "mofu" },
+
+  // NEW - Nurturing Tools
+  { id: "customerio", name: "Customer.io", description: { es: "Flujos de mensajería multicanal", en: "Multichannel messaging workflows" }, url: "https://customer.io/", icon: "MessageSquare", categoryId: "email-marketing", needs: ["automation"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "mofu" },
+  { id: "adroll", name: "AdRoll", description: { es: "Retargeting en múltiples plataformas", en: "Retargeting across multiple platforms" }, url: "https://www.adroll.com/", icon: "Target", categoryId: "social-media", needs: ["automation", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "mofu" },
+
+  // NEW - Document & Proposal Tools
+  { id: "docsend", name: "DocSend", description: { es: "Seguimiento de documentos compartidos", en: "Track shared documents" }, url: "https://www.docsend.com/", icon: "FileText", categoryId: "sales-crm", needs: ["analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+  { id: "betterproposals", name: "Better Proposals", description: { es: "Propuestas de venta modernas y trackeable", en: "Modern trackable sales proposals" }, url: "https://betterproposals.io/", icon: "FileText", categoryId: "sales-crm", needs: ["content"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+  { id: "rightinbox", name: "Right Inbox", description: { es: "Tracking de emails en Gmail", en: "Email tracking in Gmail" }, url: "https://www.rightinbox.com/", icon: "MailCheck", categoryId: "email-tools", needs: ["analytics"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "mofu" },
+
+  // NEW - Integration Platforms
+  { id: "zapier", name: "Zapier", description: { es: "Conecta apps y automatiza flujos de trabajo", en: "Connect apps and automate workflows" }, url: "https://zapier.com/", icon: "Zap", categoryId: "integrations", needs: ["automation"], levels: ["beginner", "junior", "senior"], pricing: "freemium", funnelStage: "allinone" },
+  { id: "make", name: "Make (Integromat)", description: { es: "Automatización visual de procesos", en: "Visual process automation" }, url: "https://www.make.com/", icon: "Cog", categoryId: "integrations", needs: ["automation"], levels: ["junior", "senior"], pricing: "freemium", funnelStage: "allinone" },
 ];
 
 export const getToolsByCategory = (categoryId: string): Tool[] => {
