@@ -2,14 +2,14 @@ import { useState } from "react";
 import { LucideIcon } from "lucide-react";
 import {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup
 } from "lucide-react";
 import { categories } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const iconMap: Record<string, LucideIcon> = {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup
 };
 
 const CategoryNav = () => {
