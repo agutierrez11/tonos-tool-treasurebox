@@ -11,6 +11,7 @@ import AIAgentsSection from "@/components/AIAgentsSection";
 import PipelineFilter from "@/components/PipelineFilter";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import NoCounter from "@/components/NoCounter";
+import ToolDiscovery from "@/components/ToolDiscovery";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -48,6 +49,9 @@ const Index = () => {
       
       {/* AI Agents Section */}
       <AIAgentsSection />
+      
+      {/* Tool Discovery - Web Scraping */}
+      <ToolDiscovery />
       
       {/* Pipeline Filter */}
       <PipelineFilter />
