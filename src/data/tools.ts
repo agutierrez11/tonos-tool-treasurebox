@@ -217,6 +217,25 @@ export const tools: Tool[] = [
   { id: "dnbhoovers", name: "D&B Hoovers", description: { es: "Base de datos corporativa con filtros avanzados", en: "Corporate database with advanced filters" }, url: "https://www.dnb.com/products/dnb-hoovers.html", icon: "Building2", categoryId: "lead-generation", needs: ["prospecting", "analytics"], levels: ["senior"], pricing: "paid", funnelStage: "tofu" },
   { id: "6sense", name: "6sense", description: { es: "Inteligencia de compra con IA y señales de intención", en: "AI buying intelligence with intent signals" }, url: "https://6sense.com/", icon: "Brain", categoryId: "lead-generation", needs: ["analytics", "prospecting"], levels: ["senior"], pricing: "paid", funnelStage: "tofu" },
   { id: "dealfront", name: "Dealfront", description: { es: "Tracking de visitantes web y datos B2B europeos", en: "Website visitor tracking and European B2B data" }, url: "https://www.dealfront.com/", icon: "Eye", categoryId: "lead-generation", needs: ["prospecting", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
+
+  // NEW - From Kaspr article: Scheduling & Meeting Tools
+  { id: "chilipiper", name: "Chili Piper", description: { es: "Programación instantánea de reuniones y enrutamiento de leads", en: "Instant meeting scheduling and lead routing" }, url: "https://www.chilipiper.com/", icon: "Calendar", categoryId: "sales-crm", needs: ["automation"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "mofu" },
+
+  // NEW - LinkedIn Automation
+  { id: "dripify", name: "Dripify", description: { es: "Automatización de LinkedIn y campañas multicanal", en: "LinkedIn automation and multichannel campaigns" }, url: "https://dripify.io/", icon: "Bot", categoryId: "social-media", needs: ["automation", "prospecting"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
+
+  // NEW - Video Sales Tools
+  { id: "loom", name: "Loom", description: { es: "Videos de ventas personalizados y grabación de pantalla", en: "Personalized sales videos and screen recording" }, url: "https://www.loom.com/", icon: "Video", categoryId: "webinars-video", needs: ["content", "prospecting"], levels: ["beginner", "junior", "senior"], pricing: "freemium", funnelStage: "mofu" },
+  { id: "vidyard", name: "Vidyard", description: { es: "Plataforma de video con analytics para ventas", en: "Video platform with analytics for sales" }, url: "https://www.vidyard.com/", icon: "Video", categoryId: "webinars-video", needs: ["content", "analytics"], levels: ["junior", "senior"], pricing: "freemium", funnelStage: "mofu" },
+
+  // NEW - Document Automation
+  { id: "pandadoc", name: "PandaDoc", description: { es: "Automatización de propuestas, contratos y firmas electrónicas", en: "Proposal, contract and e-signature automation" }, url: "https://www.pandadoc.com/", icon: "FileText", categoryId: "sales-crm", needs: ["automation", "content"], levels: ["junior", "senior"], pricing: "freemium", funnelStage: "bofu" },
+
+  // NEW - Sales Productivity
+  { id: "cirrusinsight", name: "Cirrus Insight", description: { es: "Integración Salesforce con Gmail/Outlook y tracking", en: "Salesforce integration with Gmail/Outlook and tracking" }, url: "https://www.cirrusinsight.com/", icon: "Mail", categoryId: "sales-crm", needs: ["automation", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "mofu" },
+
+  // NEW - Website Visitor Identification
+  { id: "leadforensics", name: "Lead Forensics", description: { es: "Identifica visitantes anónimos del sitio web", en: "Identify anonymous website visitors" }, url: "https://www.leadforensics.com/", icon: "Eye", categoryId: "lead-generation", needs: ["prospecting", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
 ];
 
 export const getToolsByCategory = (categoryId: string): Tool[] => {
