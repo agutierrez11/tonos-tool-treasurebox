@@ -8,7 +8,7 @@ import {
   Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
   UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
   User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link,
-  Workflow, Chrome, Calendar, Sparkles, PieChart
+  Workflow, Chrome, Calendar, Sparkles, PieChart, Star
 } from "lucide-react";
 import type { Tool } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -22,7 +22,7 @@ const iconMap: Record<string, LucideIcon> = {
   Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
   UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
   User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link,
-  Workflow, Chrome, Calendar, Sparkles, PieChart
+  Workflow, Chrome, Calendar, Sparkles, PieChart, Star
 };
 
 const getIcon = (iconName: string): LucideIcon => {
