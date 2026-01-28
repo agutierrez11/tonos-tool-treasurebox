@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, ExternalLink, X, Check, DollarSign, Gift } from "lucide-react";
+import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, X, Check, DollarSign, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFilteredTools, type Need, type Level, type Tool, type Pricing } from "@/data/tools";
+import ToolDetailSheet from "./ToolDetailSheet";
 
 const ToolSelector = () => {
   const { language } = useLanguage();
@@ -297,42 +298,46 @@ const pricingConfig: Record<Pricing, { color: string; label: { es: string; en: s
 };
 
 const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pricing = pricingConfig[tool.pricing];
   
   return (
-    <a
-      href={tool.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group relative flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in"
-      style={{ animationDelay: `${index * 30}ms` }}
-    >
-      {/* Pricing Badge */}
-      <div 
-        className={cn(
-          "absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white",
-          pricing.color
-        )}
-        title={pricing.label[language]}
+    <>
+      <button
+        onClick={() => setIsSheetOpen(true)}
+        className="group relative flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in w-full text-left"
+        style={{ animationDelay: `${index * 30}ms` }}
       >
-        {pricing.label[language]}
-      </div>
+        {/* Pricing dot */}
+        <div 
+          className={cn(
+            "absolute top-2 right-2 w-2 h-2 rounded-full",
+            pricing.color
+          )}
+          title={pricing.label[language]}
+        />
 
-      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-        <span className="text-lg font-bold text-primary">
-          {tool.name.charAt(0)}
-        </span>
-      </div>
-      <div className="flex-1 min-w-0 pr-14">
-        <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
-          {tool.name}
-        </h4>
-        <p className="text-xs text-muted-foreground truncate">
-          {tool.description[language]}
-        </p>
-      </div>
-      <ExternalLink className="absolute bottom-3 right-3 w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-    </a>
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+          <span className="text-lg font-bold text-primary">
+            {tool.name.charAt(0)}
+          </span>
+        </div>
+        <div className="flex-1 min-w-0 pr-6">
+          <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+            {tool.name}
+          </h4>
+          <p className="text-xs text-muted-foreground truncate">
+            {tool.description[language]}
+          </p>
+        </div>
+      </button>
+      
+      <ToolDetailSheet 
+        tool={tool} 
+        open={isSheetOpen} 
+        onOpenChange={setIsSheetOpen} 
+      />
+    </>
   );
 };
 
