@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LucideIcon, ChevronDown } from "lucide-react";
 import {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog
 } from "lucide-react";
 import { getToolsByCategory, type Category } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -10,7 +10,7 @@ import ToolCard from "./ToolCard";
 
 const iconMap: Record<string, LucideIcon> = {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog
 };
 
 interface CategorySectionProps {

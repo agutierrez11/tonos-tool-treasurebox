@@ -7,7 +7,8 @@ import {
   BarChart, Handshake, Target, RefreshCcw, PlayCircle, MessageSquare, Brain, BookOpen,
   Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
   UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
-  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link
+  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link,
+  Workflow, Chrome, Calendar, Sparkles, PieChart
 } from "lucide-react";
 import type { Tool } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -20,7 +21,8 @@ const iconMap: Record<string, LucideIcon> = {
   BarChart, Handshake, Target, RefreshCcw, PlayCircle, MessageSquare, Brain, BookOpen,
   Book, Users, UserSearch, Database, LineChart, Map, Phone, Rocket, Building2, Building,
   UserPlus, Compass, Cog, Truck, Headphones, MessageCircle, Zap, Sparkle, Package,
-  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link
+  User, Image, Video, Camera, Palette, Play, Presentation, School, Briefcase, Type, Link,
+  Workflow, Chrome, Calendar, Sparkles, PieChart
 };
 
 const getIcon = (iconName: string): LucideIcon => {
