@@ -2,8 +2,89 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// Rate limiting: Simple in-memory store (resets on function cold start)
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 20; // requests per window
+const RATE_WINDOW = 60 * 1000; // 1 minute in ms
+
+function isRateLimited(clientId: string): boolean {
+  const now = Date.now();
+  const record = requestCounts.get(clientId);
+  
+  if (!record || now > record.resetTime) {
+    requestCounts.set(clientId, { count: 1, resetTime: now + RATE_WINDOW });
+    return false;
+  }
+  
+  if (record.count >= RATE_LIMIT) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+}
+
+// Input validation
+function validateInput(data: unknown): { valid: boolean; error?: string; messages?: Array<{ role: string; content: string }>; type?: string } {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid request body' };
+  }
+  
+  const { messages, type } = data as { messages?: unknown; type?: unknown };
+  
+  // Validate messages array
+  if (!messages || !Array.isArray(messages)) {
+    return { valid: false, error: 'Messages must be an array' };
+  }
+  
+  if (messages.length === 0) {
+    return { valid: false, error: 'Messages array cannot be empty' };
+  }
+  
+  if (messages.length > 50) {
+    return { valid: false, error: 'Too many messages (max 50)' };
+  }
+  
+  // Validate each message
+  for (const msg of messages) {
+    if (!msg || typeof msg !== 'object') {
+      return { valid: false, error: 'Invalid message format' };
+    }
+    
+    const { role, content } = msg as { role?: unknown; content?: unknown };
+    
+    if (typeof role !== 'string' || !['user', 'assistant', 'system'].includes(role)) {
+      return { valid: false, error: 'Invalid message role' };
+    }
+    
+    if (typeof content !== 'string') {
+      return { valid: false, error: 'Message content must be a string' };
+    }
+    
+    if (content.length > 10000) {
+      return { valid: false, error: 'Message content too long (max 10000 chars)' };
+    }
+  }
+  
+  // Validate type if provided
+  if (type !== undefined && typeof type !== 'string') {
+    return { valid: false, error: 'Type must be a string' };
+  }
+  
+  const validTypes = ['chat', 'content', 'analyzer', 'search', undefined];
+  if (type && !validTypes.includes(type as string)) {
+    return { valid: false, error: 'Invalid type value' };
+  }
+  
+  return { 
+    valid: true, 
+    messages: messages as Array<{ role: string; content: string }>,
+    type: type as string | undefined
+  };
+}
 
 const TOOLS_CONTEXT = `
 Eres un asistente de ventas experto. Tienes acceso a un catálogo de herramientas digitales para vendedores.
@@ -36,7 +117,41 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, type } = await req.json();
+    // Get client identifier for rate limiting (use IP or a hash)
+    const clientId = req.headers.get('x-forwarded-for') || 
+                     req.headers.get('x-real-ip') || 
+                     'anonymous';
+    
+    // Check rate limit
+    if (isRateLimited(clientId)) {
+      console.warn(`Rate limit exceeded for client: ${clientId}`);
+      return new Response(
+        JSON.stringify({ error: "Demasiadas solicitudes. Espera un momento antes de intentar de nuevo." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Parse and validate input
+    let requestData: unknown;
+    try {
+      requestData = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validation = validateInput(requestData);
+    if (!validation.valid) {
+      console.warn(`Input validation failed: ${validation.error}`);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { messages, type } = validation;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -79,7 +194,7 @@ Proporciona alternativas cuando sea posible.
 Explica pros y contras de cada opción.`;
     }
 
-    console.log(`AI Chat request - Type: ${type || 'chat'}, Messages: ${messages.length}`);
+    console.log(`AI Chat request - Type: ${type || 'chat'}, Messages: ${messages!.length}, Client: ${clientId.slice(0, 8)}...`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -91,7 +206,7 @@ Explica pros y contras de cada opción.`;
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...messages!,
         ],
         stream: true,
       }),
