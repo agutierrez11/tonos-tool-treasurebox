@@ -2,3 +2,6 @@ project_id = "yzpqclsfpktmsvjczroq"
 
 [functions.ai-chat]
 verify_jwt = false
+
+[functions.notify-lead]
+verify_jwt = false
