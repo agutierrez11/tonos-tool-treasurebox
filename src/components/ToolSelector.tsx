@@ -1,21 +1,15 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, X, DollarSign, Gift } from "lucide-react";
+import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getFilteredTools, type Need, type Level, type Tool, type Pricing } from "@/data/tools";
+import { getFilteredTools, categories, type Level, type Tool, type Pricing } from "@/data/tools";
 import ToolDetailSheet from "./ToolDetailSheet";
 
 const ToolSelector = () => {
   const { language } = useLanguage();
-  const [selectedNeeds, setSelectedNeeds] = useState<Need[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
-
-  const needs = [
-    { id: "prospecting" as Need, icon: Target, label: { es: "Prospección", en: "Prospecting" } },
-    { id: "automation" as Need, icon: Zap, label: { es: "Automatización", en: "Automation" } },
-    { id: "analytics" as Need, icon: TrendingUp, label: { es: "Análisis", en: "Analytics" } },
-    { id: "content" as Need, icon: FileText, label: { es: "Contenido", en: "Content" } },
-  ];
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const levels = [
     { id: "beginner" as Level, icon: GraduationCap, label: { es: "Principiante", en: "Beginner" } },
@@ -23,50 +17,42 @@ const ToolSelector = () => {
     { id: "senior" as Level, icon: Award, label: { es: "Senior", en: "Senior" } },
   ];
 
-  const handleNeedClick = (need: Need) => {
-    setSelectedNeeds(prev => 
-      prev.includes(need) ? prev.filter(n => n !== need) : [...prev, need]
-    );
-  };
-
   const handleLevelClick = (level: Level) => {
     setSelectedLevel(selectedLevel === level ? null : level);
   };
 
-  const clearFilters = () => {
-    setSelectedNeeds([]);
-    setSelectedLevel(null);
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId) ? prev.filter(c => c !== categoryId) : [...prev, categoryId]
+    );
   };
 
-  const filteredTools = getFilteredTools(selectedNeeds, selectedLevel);
-  const hasSelection = selectedNeeds.length > 0 || selectedLevel;
+  const clearFilters = () => {
+    setSelectedLevel(null);
+    setSelectedCategories([]);
+  };
+
+  // Get tools filtered by level AND selected categories
+  const getFilteredResults = (): Tool[] => {
+    if (!selectedLevel && selectedCategories.length === 0) return [];
+    
+    const allTools = getFilteredTools([], selectedLevel);
+    
+    if (selectedCategories.length === 0) return allTools;
+    
+    return allTools.filter(tool => selectedCategories.includes(tool.categoryId));
+  };
+
+  const filteredTools = getFilteredResults();
+  const hasSelection = selectedLevel || selectedCategories.length > 0;
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-3">
-      {/* Compact filter pills */}
-      <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-        {needs.map((need) => {
-          const Icon = need.icon;
-          const isSelected = selectedNeeds.includes(need.id);
-          return (
-            <button
-              key={need.id}
-              onClick={() => handleNeedClick(need.id)}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium transition-all duration-200",
-                isSelected
-                  ? "bg-primary/90 text-primary-foreground"
-                  : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-border/30"
-              )}
-            >
-              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-              {need.label[language]}
-            </button>
-          );
-        })}
-        
-        <span className="text-muted-foreground/30 mx-0.5">|</span>
-        
+    <div className="w-full max-w-5xl mx-auto space-y-3 px-3">
+      {/* Level Selection - Always visible */}
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        <span className="text-xs text-muted-foreground mr-1">
+          {language === "es" ? "Tu nivel:" : "Your level:"}
+        </span>
         {levels.map((level) => {
           const Icon = level.icon;
           const isSelected = selectedLevel === level.id;
@@ -75,13 +61,13 @@ const ToolSelector = () => {
               key={level.id}
               onClick={() => handleLevelClick(level.id)}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium transition-all duration-200",
+                "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium transition-all",
                 isSelected
-                  ? "bg-accent/90 text-accent-foreground"
-                  : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-border/30"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-card text-muted-foreground hover:bg-muted border border-border"
               )}
             >
-              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              <Icon className="w-3 h-3" />
               {level.label[language]}
             </button>
           );
@@ -90,31 +76,70 @@ const ToolSelector = () => {
         {hasSelection && (
           <button
             onClick={clearFilters}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-muted/30"
+            className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded hover:bg-muted"
+            title={language === "es" ? "Limpiar filtros" : "Clear filters"}
           >
             <X className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
-      {/* Filtered results - only show when filters are active */}
+      {/* Category Selection - Expandable */}
+      <div className="space-y-2">
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center justify-center gap-1 mx-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {language === "es" ? "Filtrar por categorías" : "Filter by categories"}
+          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
+
+        {isExpanded && (
+          <div className="flex flex-wrap items-center justify-center gap-1 animate-fade-in">
+            {categories.map((category) => {
+              const isSelected = selectedCategories.includes(category.id);
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategoryClick(category.id)}
+                  className={cn(
+                    "px-2 py-0.5 rounded-full text-[10px] font-medium transition-all",
+                    isSelected
+                      ? "bg-accent text-accent-foreground shadow-sm"
+                      : "bg-card/80 text-muted-foreground hover:bg-muted border border-border/50"
+                  )}
+                >
+                  {category.name[language]}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Results */}
       {hasSelection && (
         <div className="space-y-2 animate-fade-in">
           <p className="text-center text-xs text-muted-foreground">
-            {filteredTools.length} {language === "es" ? "herramientas encontradas" : "tools found"}
+            {filteredTools.length} {language === "es" ? "herramientas" : "tools"}
+            {selectedLevel && (
+              <span className="text-primary font-medium ml-1">
+                {levels.find(l => l.id === selectedLevel)?.label[language]}
+              </span>
+            )}
           </p>
           
           {filteredTools.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-              {filteredTools.slice(0, 8).map((tool, index) => (
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5">
+              {filteredTools.slice(0, 18).map((tool, index) => (
                 <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
               ))}
             </div>
           )}
           
-          {filteredTools.length > 8 && (
-            <p className="text-center text-xs text-muted-foreground">
-              +{filteredTools.length - 8} {language === "es" ? "más en las categorías abajo" : "more in categories below"}
+          {filteredTools.length > 18 && (
+            <p className="text-center text-[10px] text-muted-foreground">
+              +{filteredTools.length - 18} {language === "es" ? "más abajo" : "more below"}
             </p>
           )}
         </div>
@@ -143,21 +168,19 @@ const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
     <>
       <button
         onClick={() => setIsSheetOpen(true)}
-        className="group relative flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-card/50 border border-border/30 hover:border-primary/40 hover:bg-card transition-all duration-200 w-full text-left"
-        style={{ animationDelay: `${index * 20}ms` }}
+        className="group relative flex items-center gap-1.5 p-1.5 rounded-md bg-card border border-border/50 hover:border-primary/40 hover:shadow-sm transition-all w-full text-left"
+        style={{ animationDelay: `${index * 15}ms` }}
       >
-        <div className={cn("absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full", pricing.color)} />
+        <div className={cn("absolute top-1 right-1 w-1.5 h-1.5 rounded-full", pricing.color)} />
         
-        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
-          <span className="text-xs sm:text-sm font-semibold text-primary">
+        <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <span className="text-[10px] font-semibold text-primary">
             {tool.name.charAt(0)}
           </span>
         </div>
-        <div className="flex-1 min-w-0 pr-3">
-          <h4 className="text-xs font-medium text-foreground truncate group-hover:text-primary transition-colors">
-            {tool.name}
-          </h4>
-        </div>
+        <span className="text-[10px] font-medium text-foreground truncate group-hover:text-primary transition-colors pr-2">
+          {tool.name}
+        </span>
       </button>
       
       <ToolDetailSheet 
