@@ -7,6 +7,7 @@ import SalesCalculator from "@/components/SalesCalculator";
 import CallFunnelCalculator from "@/components/CallFunnelCalculator";
 import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
+import AIAgentsSection from "@/components/AIAgentsSection";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import NoCounter from "@/components/NoCounter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -37,6 +38,9 @@ const Index = () => {
       
       {/* Time Blocking Strategy */}
       <TimeBlockingStrategy />
+      
+      {/* AI Agents Section */}
+      <AIAgentsSection />
       
       {/* Tool Categories Navigation */}
       <CategoryNav />
