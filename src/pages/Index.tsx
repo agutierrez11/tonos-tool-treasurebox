@@ -8,7 +8,6 @@ import CallFunnelCalculator from "@/components/CallFunnelCalculator";
 import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
-import PipelineFilter from "@/components/PipelineFilter";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import NoCounter from "@/components/NoCounter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -28,19 +27,13 @@ const Index = () => {
       
       <Header />
       
-      {/* NO → YES Counter - Most visible at top */}
+      {/* NO → YES Counter */}
       <NoCounter />
       
-      {/* Sales Calculator */}
+      {/* Sales Calculators - Collapsible */}
       <SalesCalculator />
-      
-      {/* Call Funnel Calculator */}
       <CallFunnelCalculator />
-      
-      {/* Email Funnel Calculator */}
       <EmailFunnelCalculator />
-      
-      {/* Prospect Funnel Calculator */}
       <ProspectFunnelCalculator />
       
       {/* Time Blocking Strategy */}
@@ -49,13 +42,12 @@ const Index = () => {
       {/* AI Agents Section */}
       <AIAgentsSection />
       
-      {/* Pipeline Filter */}
-      <PipelineFilter />
-      
+      {/* Tool Categories Navigation */}
       <CategoryNav />
       
-      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-10 md:py-12">
-        <div className="space-y-10 sm:space-y-12 md:space-y-16">
+      {/* Tool Categories - Main Content */}
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        <div className="space-y-6 sm:space-y-8">
           {categories.map((category, index) => (
             <CategorySection 
               key={category.id} 
