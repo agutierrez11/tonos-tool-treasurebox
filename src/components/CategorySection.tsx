@@ -1,16 +1,23 @@
 import { useState } from "react";
-import { LucideIcon, ChevronDown } from "lucide-react";
+import { LucideIcon, ChevronDown, Circle } from "lucide-react";
 import {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic
 } from "lucide-react";
-import { getToolsByCategory, type Category } from "@/data/tools";
+import { getToolsByCategory, type Category, type Pricing } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ToolCard from "./ToolCard";
+import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic
+};
+
+const pricingColors: Record<Pricing, string> = {
+  free: "text-emerald-500",
+  freemium: "text-amber-500",
+  paid: "text-rose-500",
 };
 
 interface CategorySectionProps {
@@ -20,11 +27,17 @@ interface CategorySectionProps {
 
 const CategorySection = ({ category, index }: CategorySectionProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const categoryTools = getToolsByCategory(category.id);
   const IconComponent = iconMap[category.icon] || Folder;
 
   if (categoryTools.length === 0) return null;
+
+  // Count pricing types in category
+  const pricingCounts = categoryTools.reduce((acc, tool) => {
+    acc[tool.pricing] = (acc[tool.pricing] || 0) + 1;
+    return acc;
+  }, {} as Record<Pricing, number>);
 
   return (
     <section
@@ -49,6 +62,24 @@ const CategorySection = ({ category, index }: CategorySectionProps) => {
           <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
             {categoryTools.length}
           </span>
+          {/* Pricing indicators */}
+          <div className="flex items-center gap-0.5 ml-1">
+            {pricingCounts.free && (
+              <div className="flex items-center" title={language === "es" ? `${pricingCounts.free} gratis` : `${pricingCounts.free} free`}>
+                <Circle className={cn("w-2 h-2 fill-current", pricingColors.free)} />
+              </div>
+            )}
+            {pricingCounts.freemium && (
+              <div className="flex items-center" title={language === "es" ? `${pricingCounts.freemium} freemium` : `${pricingCounts.freemium} freemium`}>
+                <Circle className={cn("w-2 h-2 fill-current", pricingColors.freemium)} />
+              </div>
+            )}
+            {pricingCounts.paid && (
+              <div className="flex items-center" title={language === "es" ? `${pricingCounts.paid} de pago` : `${pricingCounts.paid} paid`}>
+                <Circle className={cn("w-2 h-2 fill-current", pricingColors.paid)} />
+              </div>
+            )}
+          </div>
         </div>
         <ChevronDown 
           className={`w-4 h-4 text-muted-foreground transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`} 

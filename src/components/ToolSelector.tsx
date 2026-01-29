@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp, Download } from "lucide-react";
+import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp, Download, Circle, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getFilteredTools, categories, type Level, type Tool, type Pricing } from "@/data/tools";
+import { getFilteredTools, categories, type Level, type Tool, type Pricing, type FunnelStage } from "@/data/tools";
 import ToolDetailSheet from "./ToolDetailSheet";
 import TechStackExport from "./TechStackExport";
 
@@ -10,12 +10,27 @@ const ToolSelector = () => {
   const { language } = useLanguage();
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedFunnelStage, setSelectedFunnelStage] = useState<FunnelStage | null>(null);
+  const [selectedPricing, setSelectedPricing] = useState<Pricing | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const levels = [
     { id: "beginner" as Level, icon: GraduationCap, label: { es: "Principiante", en: "Beginner" } },
     { id: "junior" as Level, icon: Briefcase, label: { es: "Junior", en: "Junior" } },
     { id: "senior" as Level, icon: Award, label: { es: "Senior", en: "Senior" } },
+  ];
+
+  const funnelStages = [
+    { id: "tofu" as FunnelStage, label: { es: "TOFU", en: "TOFU" }, desc: { es: "Atracción", en: "Awareness" } },
+    { id: "mofu" as FunnelStage, label: { es: "MOFU", en: "MOFU" }, desc: { es: "Consideración", en: "Consideration" } },
+    { id: "bofu" as FunnelStage, label: { es: "BOFU", en: "BOFU" }, desc: { es: "Decisión", en: "Decision" } },
+    { id: "allinone" as FunnelStage, label: { es: "Todo-en-uno", en: "All-in-One" }, desc: { es: "Completo", en: "Complete" } },
+  ];
+
+  const pricingOptions: { id: Pricing; label: { es: string; en: string }; color: string }[] = [
+    { id: "free", label: { es: "Gratis", en: "Free" }, color: "bg-emerald-500" },
+    { id: "freemium", label: { es: "Freemium", en: "Freemium" }, color: "bg-amber-500" },
+    { id: "paid", label: { es: "De pago", en: "Paid" }, color: "bg-rose-500" },
   ];
 
   const handleLevelClick = (level: Level) => {
@@ -28,24 +43,37 @@ const ToolSelector = () => {
     );
   };
 
+  const handleFunnelClick = (stage: FunnelStage) => {
+    setSelectedFunnelStage(selectedFunnelStage === stage ? null : stage);
+  };
+
+  const handlePricingClick = (pricing: Pricing) => {
+    setSelectedPricing(selectedPricing === pricing ? null : pricing);
+  };
+
   const clearFilters = () => {
     setSelectedLevel(null);
     setSelectedCategories([]);
+    setSelectedFunnelStage(null);
+    setSelectedPricing(null);
   };
 
-  // Get tools filtered by level AND selected categories
+  // Get tools filtered by all criteria
   const getFilteredResults = (): Tool[] => {
-    if (!selectedLevel && selectedCategories.length === 0) return [];
+    if (!selectedLevel && selectedCategories.length === 0 && !selectedFunnelStage && !selectedPricing) return [];
     
     const allTools = getFilteredTools([], selectedLevel);
     
-    if (selectedCategories.length === 0) return allTools;
-    
-    return allTools.filter(tool => selectedCategories.includes(tool.categoryId));
+    return allTools.filter(tool => {
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(tool.categoryId);
+      const matchesFunnel = !selectedFunnelStage || tool.funnelStage === selectedFunnelStage;
+      const matchesPricing = !selectedPricing || tool.pricing === selectedPricing;
+      return matchesCategory && matchesFunnel && matchesPricing;
+    });
   };
 
   const filteredTools = getFilteredResults();
-  const hasSelection = selectedLevel || selectedCategories.length > 0;
+  const hasSelection = selectedLevel || selectedCategories.length > 0 || selectedFunnelStage || selectedPricing;
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-3 px-3">
@@ -85,12 +113,63 @@ const ToolSelector = () => {
         )}
       </div>
 
+      {/* Funnel Stage Selection */}
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        <span className="text-xs text-muted-foreground mr-1">
+          {language === "es" ? "Etapa:" : "Stage:"}
+        </span>
+        {funnelStages.map((stage) => {
+          const isSelected = selectedFunnelStage === stage.id;
+          return (
+            <button
+              key={stage.id}
+              onClick={() => handleFunnelClick(stage.id)}
+              className={cn(
+                "px-2 py-1 rounded-full text-xs font-medium transition-all",
+                isSelected
+                  ? "bg-accent text-accent-foreground shadow-sm"
+                  : "bg-card text-muted-foreground hover:bg-muted border border-border"
+              )}
+              title={stage.desc[language]}
+            >
+              {stage.label[language]}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Pricing Filter */}
+      <div className="flex flex-wrap items-center justify-center gap-1.5">
+        <span className="text-xs text-muted-foreground mr-1">
+          {language === "es" ? "Precio:" : "Price:"}
+        </span>
+        {pricingOptions.map((option) => {
+          const isSelected = selectedPricing === option.id;
+          return (
+            <button
+              key={option.id}
+              onClick={() => handlePricingClick(option.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-all",
+                isSelected
+                  ? "bg-secondary text-secondary-foreground shadow-sm"
+                  : "bg-card text-muted-foreground hover:bg-muted border border-border"
+              )}
+            >
+              <Circle className={cn("w-2 h-2 fill-current", option.color.replace("bg-", "text-"))} />
+              {option.label[language]}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Category Selection - Expandable */}
       <div className="space-y-2">
         <button 
           onClick={() => setIsExpanded(!isExpanded)}
           className="flex items-center justify-center gap-1 mx-auto text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
+          <Filter className="w-3 h-3" />
           {language === "es" ? "Filtrar por categorías" : "Filter by categories"}
           {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
         </button>
@@ -127,6 +206,11 @@ const ToolSelector = () => {
               {selectedLevel && (
                 <span className="text-primary font-medium ml-1">
                   • {levels.find(l => l.id === selectedLevel)?.label[language]}
+                </span>
+              )}
+              {selectedFunnelStage && (
+                <span className="text-accent-foreground font-medium ml-1">
+                  • {funnelStages.find(s => s.id === selectedFunnelStage)?.label[language]}
                 </span>
               )}
             </p>

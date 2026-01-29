@@ -1,132 +1,59 @@
-import { useState } from "react";
-import { Search, ExternalLink, Star, Loader2, Sparkles } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, Loader2, Sparkles, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useToast } from "@/hooks/use-toast";
-import { tools } from "@/data/tools";
+import { tools, categories, type Tool } from "@/data/tools";
+import { cn } from "@/lib/utils";
+
+const pricingColors = {
+  free: "bg-emerald-500",
+  freemium: "bg-amber-500",
+  paid: "bg-rose-500",
+};
 
 const SmartSearchDemo = () => {
   const { language } = useLanguage();
-  const { toast } = useToast();
   const [query, setQuery] = useState("");
-  const [aiResponse, setAiResponse] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
-  const handleSearch = async () => {
+  // Local search - searches directly in tools array
+  const searchResults = useMemo(() => {
+    if (!query.trim() || query.length < 2) return [];
+
+    const searchTerm = query.toLowerCase().trim();
+    
+    return tools.filter(tool => {
+      const nameMatch = tool.name.toLowerCase().includes(searchTerm);
+      const descMatch = tool.description[language].toLowerCase().includes(searchTerm);
+      const categoryMatch = categories.find(c => c.id === tool.categoryId)?.name[language].toLowerCase().includes(searchTerm);
+      return nameMatch || descMatch || categoryMatch;
+    }).slice(0, 8); // Limit to 8 results
+  }, [query, language]);
+
+  const handleSearch = () => {
     if (!query.trim()) return;
-
     setIsSearching(true);
-    setAiResponse("");
-
-    // Create a summary of available tools for context
-    const toolsSummary = tools.slice(0, 30).map(t => 
-      `- ${t.name}: ${language === "es" ? t.description.es : t.description.en} (${t.categoryId}, ${t.pricing})`
-    ).join("\n");
-
-    const prompt = language === "es"
-      ? `El usuario busca: "${query}"
-
-Herramientas disponibles en nuestro catálogo:
-${toolsSummary}
-
-Basándote en la búsqueda del usuario:
-1. Recomienda las 3 herramientas más relevantes de la lista
-2. Explica brevemente por qué cada una es útil para su necesidad
-3. Si ninguna herramienta encaja perfectamente, sugiere la más cercana y explica qué considerar
-
-Responde de forma concisa y práctica.`
-      : `User is looking for: "${query}"
-
-Tools available in our catalog:
-${toolsSummary}
-
-Based on the user's search:
-1. Recommend the 3 most relevant tools from the list
-2. Briefly explain why each is useful for their need
-3. If no tool fits perfectly, suggest the closest one and explain what to consider
-
-Respond concisely and practically.`;
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            messages: [{ role: "user", content: prompt }],
-            type: "search",
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error en la respuesta");
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("No reader available");
-
-      const decoder = new TextDecoder();
-      let content = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
-
-        for (const line of lines) {
-          if (line.startsWith("data: ") && line !== "data: [DONE]") {
-            try {
-              const jsonStr = line.slice(6).trim();
-              if (jsonStr) {
-                const parsed = JSON.parse(jsonStr);
-                const delta = parsed.choices?.[0]?.delta?.content;
-                if (delta) {
-                  content += delta;
-                  setAiResponse(content);
-                }
-              }
-            } catch {
-              // Skip invalid JSON
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Search error:", error);
-      toast({
-        variant: "destructive",
-        title: language === "es" ? "Error" : "Error",
-        description: error instanceof Error ? error.message : "Error desconocido",
-      });
-    } finally {
-      setIsSearching(false);
-    }
+    // Simulate brief loading for UX
+    setTimeout(() => setIsSearching(false), 200);
   };
 
   // Quick suggestions
   const suggestions = language === "es"
-    ? ["CRM para startups", "Automatizar emails fríos", "Verificar emails", "Análisis de competencia"]
-    : ["CRM for startups", "Automate cold emails", "Email verification", "Competitor analysis"];
+    ? ["CRM", "email", "IA", "automatización", "leads", "Gemini", "Manus"]
+    : ["CRM", "email", "AI", "automation", "leads", "Gemini", "Manus"];
+
+  const getCategoryName = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId)?.name[language] || categoryId;
+  };
 
   return (
     <Card className="border-primary/20 bg-gradient-to-br from-background to-primary/5">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Search className="w-5 h-5 text-primary" />
-          {language === "es" ? "Buscador Inteligente de Herramientas" : "Smart Tool Finder"}
-          <span className="text-xs bg-green-500/20 text-green-600 px-2 py-0.5 rounded-full ml-auto">
-            IA Real
-          </span>
+          {language === "es" ? "Buscador de Herramientas" : "Tool Finder"}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -137,12 +64,12 @@ Respond concisely and practically.`;
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder={
               language === "es"
-                ? "Describe qué necesitas..."
-                : "Describe what you need..."
+                ? "Buscar por nombre, categoría..."
+                : "Search by name, category..."
             }
             className="flex-1"
           />
-          <Button onClick={handleSearch} disabled={isSearching}>
+          <Button onClick={handleSearch} disabled={isSearching} size="icon">
             {isSearching ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
@@ -151,14 +78,13 @@ Respond concisely and practically.`;
           </Button>
         </div>
 
-        {!aiResponse && !isSearching && (
+        {/* Quick suggestions */}
+        {!query && (
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion}
-                onClick={() => {
-                  setQuery(suggestion);
-                }}
+                onClick={() => setQuery(suggestion)}
                 className="text-xs px-2 py-1 rounded-full bg-muted hover:bg-muted/80 transition-colors"
               >
                 {suggestion}
@@ -167,28 +93,75 @@ Respond concisely and practically.`;
           </div>
         )}
 
-        {isSearching && (
-          <div className="text-center py-4">
-            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              {language === "es" ? "Buscando con IA..." : "Searching with AI..."}
-            </div>
-          </div>
-        )}
-
-        {aiResponse && (
-          <div className="p-3 rounded-lg border bg-muted/30 max-h-64 overflow-y-auto">
-            <p className="text-sm whitespace-pre-wrap">{aiResponse}</p>
+        {/* Search Results */}
+        {query.length >= 2 && (
+          <div className="space-y-2">
+            {searchResults.length > 0 ? (
+              <>
+                <p className="text-xs text-muted-foreground">
+                  {searchResults.length} {language === "es" ? "resultados" : "results"}
+                </p>
+                <div className="grid gap-2 max-h-64 overflow-y-auto">
+                  {searchResults.map((tool) => (
+                    <ToolResultItem key={tool.id} tool={tool} language={language} getCategoryName={getCategoryName} />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {language === "es" 
+                  ? "No se encontraron herramientas. Prueba otro término."
+                  : "No tools found. Try another term."}
+              </p>
+            )}
           </div>
         )}
 
         <p className="text-xs text-muted-foreground text-center">
           {language === "es"
-            ? "🤖 Powered by Lovable AI - Búsqueda semántica inteligente"
-            : "🤖 Powered by Lovable AI - Intelligent semantic search"}
+            ? `🔍 Buscando en ${tools.length} herramientas`
+            : `🔍 Searching ${tools.length} tools`}
         </p>
       </CardContent>
     </Card>
+  );
+};
+
+interface ToolResultItemProps {
+  tool: Tool;
+  language: "es" | "en";
+  getCategoryName: (id: string) => string;
+}
+
+const ToolResultItem = ({ tool, language, getCategoryName }: ToolResultItemProps) => {
+  return (
+    <a
+      href={tool.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-3 p-2 rounded-md border border-border/50 hover:border-primary/40 hover:bg-muted/50 transition-all group"
+    >
+      <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <span className="text-sm font-semibold text-primary">
+          {tool.name.charAt(0)}
+        </span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-sm text-foreground group-hover:text-primary transition-colors">
+            {tool.name}
+          </span>
+          <span className={cn("w-2 h-2 rounded-full flex-shrink-0", pricingColors[tool.pricing])} />
+        </div>
+        <p className="text-xs text-muted-foreground truncate">
+          {tool.description[language]}
+        </p>
+        <span className="text-[10px] text-muted-foreground/70">
+          {getCategoryName(tool.categoryId)}
+        </span>
+      </div>
+      <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+    </a>
   );
 };
 
