@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, X, Check, DollarSign, Gift } from "lucide-react";
+import { Target, TrendingUp, Zap, FileText, GraduationCap, Briefcase, Award, X, DollarSign, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFilteredTools, type Need, type Level, type Tool, type Pricing } from "@/data/tools";
 import ToolDetailSheet from "./ToolDetailSheet";
@@ -11,58 +11,21 @@ const ToolSelector = () => {
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
   const needs = [
-    {
-      id: "prospecting" as Need,
-      icon: Target,
-      label: { es: "Prospección", en: "Prospecting" },
-      description: { es: "Encuentra leads y contactos", en: "Find leads and contacts" },
-    },
-    {
-      id: "automation" as Need,
-      icon: Zap,
-      label: { es: "Automatización", en: "Automation" },
-      description: { es: "Automatiza tareas repetitivas", en: "Automate repetitive tasks" },
-    },
-    {
-      id: "analytics" as Need,
-      icon: TrendingUp,
-      label: { es: "Análisis", en: "Analytics" },
-      description: { es: "Mide y optimiza resultados", en: "Measure and optimize results" },
-    },
-    {
-      id: "content" as Need,
-      icon: FileText,
-      label: { es: "Contenido", en: "Content" },
-      description: { es: "Crea contenido persuasivo", en: "Create persuasive content" },
-    },
+    { id: "prospecting" as Need, icon: Target, label: { es: "Prospección", en: "Prospecting" } },
+    { id: "automation" as Need, icon: Zap, label: { es: "Automatización", en: "Automation" } },
+    { id: "analytics" as Need, icon: TrendingUp, label: { es: "Análisis", en: "Analytics" } },
+    { id: "content" as Need, icon: FileText, label: { es: "Contenido", en: "Content" } },
   ];
 
   const levels = [
-    {
-      id: "beginner" as Level,
-      icon: GraduationCap,
-      label: { es: "Principiante", en: "Beginner" },
-      description: { es: "Empezando en ventas", en: "Starting in sales" },
-    },
-    {
-      id: "junior" as Level,
-      icon: Briefcase,
-      label: { es: "Junior", en: "Junior" },
-      description: { es: "1-3 años de experiencia", en: "1-3 years experience" },
-    },
-    {
-      id: "senior" as Level,
-      icon: Award,
-      label: { es: "Senior", en: "Senior" },
-      description: { es: "Experto en ventas", en: "Sales expert" },
-    },
+    { id: "beginner" as Level, icon: GraduationCap, label: { es: "Principiante", en: "Beginner" } },
+    { id: "junior" as Level, icon: Briefcase, label: { es: "Junior", en: "Junior" } },
+    { id: "senior" as Level, icon: Award, label: { es: "Senior", en: "Senior" } },
   ];
 
   const handleNeedClick = (need: Need) => {
     setSelectedNeeds(prev => 
-      prev.includes(need) 
-        ? prev.filter(n => n !== need)
-        : [...prev, need]
+      prev.includes(need) ? prev.filter(n => n !== need) : [...prev, need]
     );
   };
 
@@ -79,193 +42,80 @@ const ToolSelector = () => {
   const hasSelection = selectedNeeds.length > 0 || selectedLevel;
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 sm:space-y-8">
-      {/* Section Title */}
-      <div className="text-center">
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-foreground mb-2">
-          {language === "es" 
-            ? "Encuentra tu stock de herramientas ideal" 
-            : "Find your ideal tool stack"
-          }
-        </h2>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          {language === "es"
-            ? "Selecciona según tus necesidades y nivel de experiencia"
-            : "Select based on your needs and experience level"
-          }
-        </p>
-      </div>
-
-      {/* Needs Section - Multi-select */}
-      <div className="space-y-3">
-        <h3 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider text-center">
-          {language === "es" ? "¿Qué necesitas? (puedes elegir varias)" : "What do you need? (select multiple)"}
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-          {needs.map((need) => {
-            const Icon = need.icon;
-            const isSelected = selectedNeeds.includes(need.id);
-            return (
-              <button
-                key={need.id}
-                onClick={() => handleNeedClick(need.id)}
-                className={cn(
-                  "group relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border transition-all duration-300",
-                  "hover:scale-[1.02] hover:shadow-lg",
-                  isSelected
-                    ? "bg-primary/10 border-primary shadow-md"
-                    : "bg-card/50 border-border/50 hover:border-primary/50 hover:bg-card"
-                )}
-              >
-                {isSelected && (
-                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="w-3 h-3 text-primary-foreground" />
-                  </div>
-                )}
-                <div
-                  className={cn(
-                    "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors",
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground group-hover:bg-primary/20 group-hover:text-primary"
-                  )}
-                >
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-                <div className="text-center">
-                  <span className={cn(
-                    "text-xs sm:text-sm font-medium block",
-                    isSelected ? "text-primary" : "text-foreground"
-                  )}>
-                    {need.label[language]}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
-                    {need.description[language]}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Level Section */}
-      <div className="space-y-3">
-        <h3 className="text-xs sm:text-sm font-medium text-muted-foreground uppercase tracking-wider text-center">
-          {language === "es" ? "Tu nivel de experiencia" : "Your experience level"}
-        </h3>
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {levels.map((level) => {
-            const Icon = level.icon;
-            const isSelected = selectedLevel === level.id;
-            return (
-              <button
-                key={level.id}
-                onClick={() => handleLevelClick(level.id)}
-                className={cn(
-                  "group relative flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border transition-all duration-300",
-                  "hover:scale-[1.02] hover:shadow-lg",
-                  isSelected
-                    ? "bg-accent/20 border-accent shadow-md"
-                    : "bg-card/50 border-border/50 hover:border-accent/50 hover:bg-card"
-                )}
-              >
-                <div
-                  className={cn(
-                    "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center transition-colors",
-                    isSelected
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-muted text-muted-foreground group-hover:bg-accent/20 group-hover:text-accent"
-                  )}
-                >
-                  <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
-                </div>
-                <div className="text-center">
-                  <span className={cn(
-                    "text-xs sm:text-sm font-medium block",
-                    isSelected ? "text-accent" : "text-foreground"
-                  )}>
-                    {level.label[language]}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
-                    {level.description[language]}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Selection Summary & Results */}
-      {hasSelection && (
-        <div className="space-y-4 animate-fade-in">
-          {/* Summary Header */}
-          <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 border border-border/30">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              {language === "es" ? "Mostrando" : "Showing"}
-              <span className="font-semibold text-foreground mx-1">{filteredTools.length}</span>
-              {language === "es" ? "herramientas para:" : "tools for:"}
-              {selectedNeeds.length > 0 && (
-                <span className="ml-1">
-                  {selectedNeeds.map((needId, idx) => (
-                    <span key={needId}>
-                      <span className="font-medium text-primary">
-                        {needs.find(n => n.id === needId)?.label[language]}
-                      </span>
-                      {idx < selectedNeeds.length - 1 && <span className="mx-1">+</span>}
-                    </span>
-                  ))}
-                </span>
-              )}
-              {selectedNeeds.length > 0 && selectedLevel && <span className="mx-1">•</span>}
-              {selectedLevel && (
-                <span className="font-medium text-accent">
-                  {levels.find(l => l.id === selectedLevel)?.label[language]}
-                </span>
-              )}
-            </p>
+    <div className="w-full max-w-4xl mx-auto space-y-3">
+      {/* Compact filter pills */}
+      <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+        {needs.map((need) => {
+          const Icon = need.icon;
+          const isSelected = selectedNeeds.includes(need.id);
+          return (
             <button
-              onClick={clearFilters}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted/50"
+              key={need.id}
+              onClick={() => handleNeedClick(need.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium transition-all duration-200",
+                isSelected
+                  ? "bg-primary/90 text-primary-foreground"
+                  : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-border/30"
+              )}
             >
-              <X className="w-3 h-3" />
-              {language === "es" ? "Limpiar" : "Clear"}
+              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              {need.label[language]}
             </button>
-          </div>
+          );
+        })}
+        
+        <span className="text-muted-foreground/30 mx-0.5">|</span>
+        
+        {levels.map((level) => {
+          const Icon = level.icon;
+          const isSelected = selectedLevel === level.id;
+          return (
+            <button
+              key={level.id}
+              onClick={() => handleLevelClick(level.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium transition-all duration-200",
+                isSelected
+                  ? "bg-accent/90 text-accent-foreground"
+                  : "bg-card/50 text-muted-foreground hover:bg-card hover:text-foreground border border-border/30"
+              )}
+            >
+              <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+              {level.label[language]}
+            </button>
+          );
+        })}
+        
+        {hasSelection && (
+          <button
+            onClick={clearFilters}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-md hover:bg-muted/30"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
 
-          {/* Pricing Legend */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span className="text-muted-foreground">{language === "es" ? "Gratis" : "Free"}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-              <span className="text-muted-foreground">Freemium</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
-              <span className="text-muted-foreground">{language === "es" ? "Paga" : "Paid"}</span>
-            </div>
-          </div>
-
-          {/* Results Grid */}
+      {/* Filtered results - only show when filters are active */}
+      {hasSelection && (
+        <div className="space-y-2 animate-fade-in">
+          <p className="text-center text-xs text-muted-foreground">
+            {filteredTools.length} {language === "es" ? "herramientas encontradas" : "tools found"}
+          </p>
+          
           {filteredTools.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-              {filteredTools.map((tool, index) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              {filteredTools.slice(0, 8).map((tool, index) => (
                 <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
               ))}
             </div>
           )}
-
-          {filteredTools.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              {language === "es" 
-                ? "No hay herramientas que coincidan con esta combinación"
-                : "No tools match this combination"
-              }
-            </div>
+          
+          {filteredTools.length > 8 && (
+            <p className="text-center text-xs text-muted-foreground">
+              +{filteredTools.length - 8} {language === "es" ? "más en las categorías abajo" : "more in categories below"}
+            </p>
           )}
         </div>
       )}
@@ -279,22 +129,10 @@ interface ToolResultCardProps {
   language: "es" | "en";
 }
 
-const pricingConfig: Record<Pricing, { color: string; label: { es: string; en: string }; icon: typeof DollarSign }> = {
-  free: { 
-    color: "bg-emerald-500", 
-    label: { es: "Gratis", en: "Free" },
-    icon: Gift
-  },
-  freemium: { 
-    color: "bg-amber-500", 
-    label: { es: "Freemium", en: "Freemium" },
-    icon: Gift
-  },
-  paid: { 
-    color: "bg-rose-500", 
-    label: { es: "Paga", en: "Paid" },
-    icon: DollarSign
-  },
+const pricingConfig: Record<Pricing, { color: string }> = {
+  free: { color: "bg-emerald-500" },
+  freemium: { color: "bg-amber-500" },
+  paid: { color: "bg-rose-500" },
 };
 
 const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
@@ -305,30 +143,20 @@ const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
     <>
       <button
         onClick={() => setIsSheetOpen(true)}
-        className="group relative flex items-center gap-3 p-3 rounded-xl bg-card/60 border border-border/40 hover:border-primary/50 hover:bg-card hover:shadow-lg transition-all duration-300 animate-fade-in w-full text-left"
-        style={{ animationDelay: `${index * 30}ms` }}
+        className="group relative flex items-center gap-2 p-2 sm:p-2.5 rounded-lg bg-card/50 border border-border/30 hover:border-primary/40 hover:bg-card transition-all duration-200 w-full text-left"
+        style={{ animationDelay: `${index * 20}ms` }}
       >
-        {/* Pricing dot */}
-        <div 
-          className={cn(
-            "absolute top-2 right-2 w-2 h-2 rounded-full",
-            pricing.color
-          )}
-          title={pricing.label[language]}
-        />
-
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-          <span className="text-lg font-bold text-primary">
+        <div className={cn("absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full", pricing.color)} />
+        
+        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <span className="text-xs sm:text-sm font-semibold text-primary">
             {tool.name.charAt(0)}
           </span>
         </div>
-        <div className="flex-1 min-w-0 pr-6">
-          <h4 className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
+        <div className="flex-1 min-w-0 pr-3">
+          <h4 className="text-xs font-medium text-foreground truncate group-hover:text-primary transition-colors">
             {tool.name}
           </h4>
-          <p className="text-xs text-muted-foreground truncate">
-            {tool.description[language]}
-          </p>
         </div>
       </button>
       
