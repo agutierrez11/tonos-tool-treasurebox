@@ -90,7 +90,7 @@ const NoCounter = () => {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-3 sm:px-4 py-4 relative">
+    <section className="max-w-6xl mx-auto px-3 sm:px-4 py-3 relative">
       {/* Celebration Overlay */}
       {showCelebration && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
@@ -133,8 +133,8 @@ const NoCounter = () => {
         </div>
       )}
 
-      <Card className="bg-gradient-to-br from-orange-500/10 via-background to-red-500/10 border-orange-500/30 shadow-lg shadow-orange-500/5">
-        <CardContent className="p-4 sm:p-6">
+      <Card className="bg-gradient-to-br from-orange-500/5 via-background to-red-500/5 border-orange-500/20 shadow-md">
+        <CardContent className="p-3 sm:p-4">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Title & Description */}
             <div className="flex items-center gap-3 text-center lg:text-left">

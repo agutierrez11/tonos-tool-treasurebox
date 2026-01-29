@@ -68,31 +68,31 @@ const PipelineFilter = () => {
   const selectedStageData = funnelStages.find((s) => s.id === selectedStage);
 
   return (
-    <section className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+    <section className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
       {/* Header - Collapsible */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-5 rounded-xl bg-gradient-to-br from-card/80 to-card/40 border border-border/50 hover:border-border transition-all duration-300 group"
+        className="w-full flex items-center justify-between gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 rounded-lg bg-card/40 hover:bg-card/60 border border-border/30 hover:border-border/50 transition-all duration-200 group"
       >
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-            <Layers className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-primary/15 flex items-center justify-center">
+            <Layers className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-primary" />
           </div>
           <div className="text-left">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">
+            <h2 className="font-display text-sm sm:text-base font-semibold text-foreground">
               {language === "es" ? "Filtrar por Pipeline" : "Filter by Pipeline"}
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground hidden sm:block">
               {language === "es"
-                ? "Encuentra herramientas según la etapa de tu embudo de ventas"
-                : "Find tools based on your sales funnel stage"}
+                ? "Encuentra herramientas según la etapa de tu embudo"
+                : "Find tools based on your funnel stage"}
             </p>
           </div>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground transition-transform" />
+          <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform" />
         ) : (
-          <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground transition-transform" />
+          <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform" />
         )}
       </button>
 

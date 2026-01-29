@@ -191,33 +191,33 @@ const CallFunnelCalculator = () => {
   const t = text[language];
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-6">
+    <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-4">
       {/* Toggle Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full glass-effect rounded-xl p-4 sm:p-6 flex items-center justify-between gap-4 hover:bg-card/80 transition-all duration-300 group"
+        className="w-full glass-effect rounded-lg px-3 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3 hover:bg-card/60 transition-all duration-200 group"
       >
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="p-2 sm:p-3 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
-            <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 rounded-md bg-gradient-to-br from-blue-500/80 to-blue-600/80">
+            <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <div className="text-left">
-            <h2 className="text-lg sm:text-xl font-bold text-foreground font-display">
+            <h2 className="text-sm sm:text-base font-semibold text-foreground font-display">
               {t.title}
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground hidden sm:block">
               {t.subtitle}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground hidden sm:inline">
+          <span className="text-xs text-muted-foreground hidden md:inline">
             {isExpanded ? t.hideCalculator : t.showCalculator}
           </span>
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
           )}
         </div>
       </button>

@@ -409,27 +409,27 @@ const SalesCalculator = () => {
 
   return (
     <TooltipProvider>
-      <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-6">
+      <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 py-4">
         {/* Toggle Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full glass-effect rounded-xl p-4 sm:p-6 flex items-center justify-between gap-4 hover:bg-card/80 transition-all duration-300 group"
+          className="w-full glass-effect rounded-lg px-3 py-2.5 sm:px-4 sm:py-3 flex items-center justify-between gap-3 hover:bg-card/60 transition-all duration-200 group"
         >
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="p-2 sm:p-3 rounded-lg bg-gradient-primary">
-              <Calculator className="w-5 h-5 sm:w-6 sm:h-6 text-primary-foreground" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-md bg-gradient-primary">
+              <Calculator className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
             </div>
             <div className="text-left">
-              <h2 className="text-lg sm:text-xl font-bold text-foreground font-display">
+              <h2 className="text-sm sm:text-base font-semibold text-foreground font-display">
                 {text.title}
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground hidden sm:block">
                 {text.subtitle}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
+            <span className="text-xs text-muted-foreground hidden md:inline">
               {isExpanded ? text.hideCalculator : text.showCalculator}
             </span>
             {isExpanded ? (
