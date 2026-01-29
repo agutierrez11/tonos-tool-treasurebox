@@ -53,36 +53,31 @@ const ToolCard = ({ tool, index }: ToolCardProps) => {
       <button
         onClick={() => setIsSheetOpen(true)}
         className="group block w-full text-left"
-        style={{ animationDelay: `${index * 50}ms` }}
+        style={{ animationDelay: `${index * 25}ms` }}
       >
-        <div className="relative h-full glass-effect rounded-lg sm:rounded-xl p-3.5 sm:p-5 transition-all duration-300 hover:shadow-card-hover hover:border-primary/30 hover:-translate-y-1 overflow-hidden">
+        <div className="relative h-full bg-background rounded-md p-2 sm:p-2.5 transition-all duration-200 hover:shadow-sm hover:border-primary/30 border border-border/40 overflow-hidden">
           {/* Pricing dot indicator */}
           <div 
             className={cn(
-              "absolute top-2 right-2 w-2.5 h-2.5 rounded-full",
+              "absolute top-1.5 right-1.5 w-2 h-2 rounded-full",
               pricingColors[tool.pricing]
             )}
             title={tool.pricing}
           />
           
-          {/* Glow effect on hover */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-          
           <div className="relative z-10">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-2 sm:mb-3">
-              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-md sm:rounded-lg bg-gradient-primary flex items-center justify-center shadow-glow">
-                  <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
-                </div>
-                <h3 className="font-display font-semibold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors truncate">
-                  {tool.name}
-                </h3>
+            {/* Compact Header */}
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex-shrink-0 w-6 h-6 rounded bg-primary/10 flex items-center justify-center">
+                <IconComponent className="w-3.5 h-3.5 text-primary" />
               </div>
+              <h3 className="font-medium text-xs text-foreground group-hover:text-primary transition-colors truncate pr-4">
+                {tool.name}
+              </h3>
             </div>
 
-            {/* Description */}
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
+            {/* Description - single line */}
+            <p className="text-[10px] text-muted-foreground leading-tight line-clamp-1 pl-8">
               {tool.description[language]}
             </p>
           </div>

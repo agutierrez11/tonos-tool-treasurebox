@@ -7,7 +7,6 @@ import SalesCalculator from "@/components/SalesCalculator";
 import CallFunnelCalculator from "@/components/CallFunnelCalculator";
 import EmailFunnelCalculator from "@/components/EmailFunnelCalculator";
 import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
-import AIAgentsSection from "@/components/AIAgentsSection";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import NoCounter from "@/components/NoCounter";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -39,15 +38,12 @@ const Index = () => {
       {/* Time Blocking Strategy */}
       <TimeBlockingStrategy />
       
-      {/* AI Agents Section */}
-      <AIAgentsSection />
-      
       {/* Tool Categories Navigation */}
       <CategoryNav />
       
-      {/* Tool Categories - Main Content */}
-      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="space-y-6 sm:space-y-8">
+      {/* Tool Categories - Main Content - Compact spacing */}
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-4">
+        <div className="space-y-2">
           {categories.map((category, index) => (
             <CategorySection 
               key={category.id} 

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp } from "lucide-react";
+import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFilteredTools, categories, type Level, type Tool, type Pricing } from "@/data/tools";
 import ToolDetailSheet from "./ToolDetailSheet";
+import TechStackExport from "./TechStackExport";
 
 const ToolSelector = () => {
   const { language } = useLanguage();
@@ -119,28 +120,45 @@ const ToolSelector = () => {
 
       {/* Results */}
       {hasSelection && (
-        <div className="space-y-2 animate-fade-in">
-          <p className="text-center text-xs text-muted-foreground">
-            {filteredTools.length} {language === "es" ? "herramientas" : "tools"}
-            {selectedLevel && (
-              <span className="text-primary font-medium ml-1">
-                {levels.find(l => l.id === selectedLevel)?.label[language]}
-              </span>
+        <div className="space-y-2 animate-fade-in bg-card/50 rounded-lg p-3 border border-border/30">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">{filteredTools.length}</span> {language === "es" ? "herramientas en tu stack" : "tools in your stack"}
+              {selectedLevel && (
+                <span className="text-primary font-medium ml-1">
+                  • {levels.find(l => l.id === selectedLevel)?.label[language]}
+                </span>
+              )}
+            </p>
+            {filteredTools.length > 0 && (
+              <div className="flex items-center gap-1 text-xs text-primary">
+                <Download className="w-3 h-3" />
+                {language === "es" ? "Exportar abajo" : "Export below"}
+              </div>
             )}
-          </p>
+          </div>
           
           {filteredTools.length > 0 && (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5">
-              {filteredTools.slice(0, 18).map((tool, index) => (
-                <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
-              ))}
-            </div>
-          )}
-          
-          {filteredTools.length > 18 && (
-            <p className="text-center text-[10px] text-muted-foreground">
-              +{filteredTools.length - 18} {language === "es" ? "más abajo" : "more below"}
-            </p>
+            <>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5">
+                {filteredTools.slice(0, 18).map((tool, index) => (
+                  <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
+                ))}
+              </div>
+              
+              {filteredTools.length > 18 && (
+                <p className="text-center text-[10px] text-muted-foreground">
+                  +{filteredTools.length - 18} {language === "es" ? "más en el PDF/Excel" : "more in PDF/Excel"}
+                </p>
+              )}
+              
+              {/* Export section */}
+              <TechStackExport 
+                tools={filteredTools} 
+                level={selectedLevel} 
+                selectedCategories={selectedCategories} 
+              />
+            </>
           )}
         </div>
       )}
@@ -168,7 +186,7 @@ const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
     <>
       <button
         onClick={() => setIsSheetOpen(true)}
-        className="group relative flex items-center gap-1.5 p-1.5 rounded-md bg-card border border-border/50 hover:border-primary/40 hover:shadow-sm transition-all w-full text-left"
+        className="group relative flex items-center gap-1.5 p-1.5 rounded-md bg-background border border-border/50 hover:border-primary/40 hover:shadow-sm transition-all w-full text-left"
         style={{ animationDelay: `${index * 15}ms` }}
       >
         <div className={cn("absolute top-1 right-1 w-1.5 h-1.5 rounded-full", pricing.color)} />
