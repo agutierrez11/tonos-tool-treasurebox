@@ -35,25 +35,25 @@ const CategorySection = ({ category, index }: CategorySectionProps) => {
       {/* Category Header - Clickable */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-card/50 hover:bg-card/80 border border-border/50 hover:border-border transition-all duration-300 group"
+        className="w-full flex items-center justify-between gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-card/40 hover:bg-card/60 border border-border/30 hover:border-border/50 transition-all duration-200 group"
       >
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div
-            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform`}
+            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform`}
           >
-            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+            <IconComponent className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-foreground" />
           </div>
           <div className="text-left">
-            <h2 className="font-display text-lg sm:text-xl font-bold text-foreground">
+            <h2 className="font-display text-sm sm:text-base font-semibold text-foreground">
               {category.name[language]}
             </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {categoryTools.length} {language === "es" ? "herramientas" : "tools"}
             </p>
           </div>
         </div>
         <ChevronDown 
-          className={`w-5 h-5 sm:w-6 sm:h-6 text-muted-foreground transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} 
+          className={`w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} 
         />
       </button>
 
