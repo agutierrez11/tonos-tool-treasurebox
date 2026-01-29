@@ -29,44 +29,40 @@ const CategorySection = ({ category, index }: CategorySectionProps) => {
   return (
     <section
       id={category.id}
-      className="scroll-mt-16 sm:scroll-mt-20 md:scroll-mt-24 animate-fade-in"
-      style={{ animationDelay: `${index * 50}ms` }}
+      className="scroll-mt-14 animate-fade-in"
+      style={{ animationDelay: `${index * 30}ms` }}
     >
-      {/* Category Header - Clickable */}
+      {/* Category Header - Compact clickable row */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-card/40 hover:bg-card/60 border border-border/30 hover:border-border/50 transition-all duration-200 group"
+        className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-md bg-card hover:bg-muted/50 border border-border/40 hover:border-border transition-all duration-150 group"
       >
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2">
           <div
-            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform`}
+            className={`w-7 h-7 rounded-md bg-gradient-to-br ${category.color} flex items-center justify-center flex-shrink-0`}
           >
-            <IconComponent className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-foreground" />
+            <IconComponent className="w-3.5 h-3.5 text-white" />
           </div>
-          <div className="text-left">
-            <h2 className="font-display text-sm sm:text-base font-semibold text-foreground">
-              {category.name[language]}
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              {categoryTools.length} {language === "es" ? "herramientas" : "tools"}
-            </p>
-          </div>
+          <span className="font-medium text-sm text-foreground">
+            {category.name[language]}
+          </span>
+          <span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+            {categoryTools.length}
+          </span>
         </div>
         <ChevronDown 
-          className={`w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} 
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`} 
         />
       </button>
 
       {/* Tools Grid - Collapsible */}
-      <div
-        className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 overflow-hidden transition-all duration-300 ${
-          isOpen ? "mt-4 max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        {categoryTools.map((tool, toolIndex) => (
-          <ToolCard key={tool.id} tool={tool} index={toolIndex} />
-        ))}
-      </div>
+      {isOpen && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 mt-2 pl-9 animate-fade-in">
+          {categoryTools.map((tool, toolIndex) => (
+            <ToolCard key={tool.id} tool={tool} index={toolIndex} />
+          ))}
+        </div>
+      )}
     </section>
   );
 };
