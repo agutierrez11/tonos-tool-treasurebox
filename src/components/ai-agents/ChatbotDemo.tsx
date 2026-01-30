@@ -75,18 +75,26 @@ const ChatbotDemo = () => {
       // Add empty assistant message to update
       setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
+      let buffer = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n");
+        // Append decoded chunk to buffer
+        buffer += decoder.decode(value, { stream: true });
+        
+        // Process complete lines only
+        const lines = buffer.split("\n");
+        // Keep the last incomplete line in buffer
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith("data: ") && line !== "data: [DONE]") {
+          const trimmedLine = line.trim();
+          if (trimmedLine.startsWith("data: ") && trimmedLine !== "data: [DONE]") {
             try {
-              const jsonStr = line.slice(6).trim();
-              if (jsonStr) {
+              const jsonStr = trimmedLine.slice(6);
+              if (jsonStr && jsonStr !== "[DONE]") {
                 const parsed = JSON.parse(jsonStr);
                 const content = parsed.choices?.[0]?.delta?.content;
                 if (content) {
@@ -102,7 +110,7 @@ const ChatbotDemo = () => {
                 }
               }
             } catch {
-              // Skip invalid JSON
+              // Skip invalid JSON - incomplete chunk
             }
           }
         }
