@@ -10,6 +10,7 @@ import ProspectFunnelCalculator from "@/components/ProspectFunnelCalculator";
 import AIAgentsSection from "@/components/AIAgentsSection";
 import TimeBlockingStrategy from "@/components/TimeBlockingStrategy";
 import NoCounter from "@/components/NoCounter";
+import FullCatalogExport from "@/components/FullCatalogExport";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -41,6 +42,9 @@ const Index = () => {
       
       {/* AI Agents Section */}
       <AIAgentsSection />
+      
+      {/* Full Catalog Export */}
+      <FullCatalogExport />
       
       {/* Tool Categories Navigation */}
       <CategoryNav />
