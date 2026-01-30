@@ -132,14 +132,15 @@ const TechStackExport = ({ tools, level, selectedCategories }: TechStackExportPr
         if (tip) {
           doc.setFontSize(9);
           doc.setTextColor(0, 136, 204);
-          doc.text(`💡 ${tip}`, 25, yPos);
+          const tipLabel = language === "es" ? "Tip:" : "Tip:";
+          doc.text(`${tipLabel} ${tip}`, 25, yPos);
           yPos += 6;
         }
         
         // Link
         doc.setFontSize(9);
         doc.setTextColor(100, 100, 100);
-        doc.text(`🔗 ${tool.url}`, 25, yPos);
+        doc.text(tool.url, 25, yPos);
         yPos += 12;
       });
       
