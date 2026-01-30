@@ -138,12 +138,14 @@ const FullCatalogExport = () => {
           // Metadata line
           doc.setFontSize(8);
           doc.setTextColor(100, 100, 100);
-          doc.text(`📊 ${getFunnelLabel(tool.funnelStage)} | 👤 ${getLevelLabel(tool.levels)}`, 30, yPos);
+          const funnelLabel = language === "es" ? "Etapa:" : "Stage:";
+          const levelLabel = language === "es" ? "Nivel:" : "Level:";
+          doc.text(`${funnelLabel} ${getFunnelLabel(tool.funnelStage)} | ${levelLabel} ${getLevelLabel(tool.levels)}`, 30, yPos);
           yPos += 4;
 
           // URL
           doc.setTextColor(0, 100, 200);
-          doc.text(`🔗 ${tool.url}`, 30, yPos);
+          doc.text(tool.url, 30, yPos);
           yPos += 8;
         });
 
