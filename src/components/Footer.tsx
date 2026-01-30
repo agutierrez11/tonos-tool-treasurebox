@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Heart, Mail, Phone } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import authorPhoto from "@/assets/author-profile.png";
 
@@ -39,6 +39,24 @@ const Footer = () => {
           >
             @agjbusiness
           </a>
+          
+          {/* Contact Info */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-3 text-sm text-muted-foreground">
+            <a 
+              href="mailto:antoniogtzjimenez@gmail.com" 
+              className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              antoniogtzjimenez@gmail.com
+            </a>
+            <a 
+              href="tel:+528331aborNumber" 
+              className="flex items-center gap-1.5 hover:text-primary transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              +52 833 000 0000
+            </a>
+          </div>
         </div>
 
         <div className="flex items-center justify-center gap-1.5 sm:gap-2 text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
