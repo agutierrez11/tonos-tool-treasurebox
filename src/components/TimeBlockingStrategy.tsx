@@ -57,8 +57,8 @@ const TimeBlockingStrategy: React.FC = () => {
     };
   }, [callMetrics, emailMetrics, prospectMetrics]);
 
-  // Generate time blocking strategy based on metrics
-  const timeBlocks = useMemo((): TimeBlock[] => {
+  // Generate varied time blocking strategy based on metrics and day
+  const generateDayBlocks = (dayIndex: number): TimeBlock[] => {
     const blocks: TimeBlock[] = [];
     
     // Determine focus areas based on weak points
@@ -67,59 +67,126 @@ const TimeBlockingStrategy: React.FC = () => {
     const needsMoreProspecting = conversionRates.prospectContact < 20;
     const needsFollowUp = conversionRates.showRate < 70;
 
-    // Morning block - High energy activities
-    blocks.push({
-      startTime: '09:00',
-      endTime: '10:00',
-      activity: 'Prospección y Generación de Leads',
-      activityEn: 'Prospecting & Lead Generation',
-      category: 'prospecting',
-      priority: needsMoreProspecting ? 'high' : 'medium',
-      icon: <Users className="w-4 h-4" />,
-      color: 'hsl(220, 15%, 50%)',
-      notes: needsMoreProspecting 
-        ? 'Tu tasa de contacto está baja. Enfócate en mejorar la calidad de tu base de datos.'
-        : 'Mantén tu ritmo de prospección para llenar el pipeline.',
-      notesEn: needsMoreProspecting
-        ? 'Your contact rate is low. Focus on improving your database quality.'
-        : 'Maintain your prospecting rhythm to fill the pipeline.',
-    });
+    // Different schedules for different days to add variety
+    // dayIndex: 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri
+    
+    if (dayIndex === 0 || dayIndex === 3) {
+      // Monday & Thursday: Focus on calls and prospecting
+      blocks.push({
+        startTime: '09:00',
+        endTime: '10:00',
+        activity: 'Prospección Activa',
+        activityEn: 'Active Prospecting',
+        category: 'prospecting',
+        priority: needsMoreProspecting ? 'high' : 'medium',
+        icon: <Users className="w-4 h-4" />,
+        color: 'hsl(220, 15%, 50%)',
+        notes: 'Investiga nuevos leads y prepara tu lista de contactos.',
+        notesEn: 'Research new leads and prepare your contact list.',
+      });
+      blocks.push({
+        startTime: '10:00',
+        endTime: '11:30',
+        activity: 'Bloque Intensivo de Llamadas',
+        activityEn: 'Intensive Calling Block',
+        category: 'calls',
+        priority: 'high',
+        icon: <Phone className="w-4 h-4" />,
+        color: 'hsl(217, 91%, 60%)',
+        notes: `Enfócate en llamadas en frío. Meta: 15-20 llamadas.`,
+        notesEn: `Focus on cold calls. Goal: 15-20 calls.`,
+      });
+      blocks.push({
+        startTime: '11:30',
+        endTime: '12:00',
+        activity: 'Email de Seguimiento',
+        activityEn: 'Follow-up Emails',
+        category: 'emails',
+        priority: 'medium',
+        icon: <Mail className="w-4 h-4" />,
+        color: 'hsl(280, 65%, 60%)',
+        notes: 'Envía emails a los que no contestaron la llamada.',
+        notesEn: 'Send emails to those who did not answer the call.',
+      });
+    } else if (dayIndex === 1 || dayIndex === 4) {
+      // Tuesday & Friday: Focus on emails and meetings
+      blocks.push({
+        startTime: '09:00',
+        endTime: '10:00',
+        activity: 'Revisión de Pipeline',
+        activityEn: 'Pipeline Review',
+        category: 'admin',
+        priority: 'medium',
+        icon: <Target className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Revisa tu CRM y prioriza oportunidades.',
+        notesEn: 'Review your CRM and prioritize opportunities.',
+      });
+      blocks.push({
+        startTime: '10:00',
+        endTime: '11:00',
+        activity: 'Outreach por Email',
+        activityEn: 'Email Outreach',
+        category: 'emails',
+        priority: needsMoreEmails ? 'high' : 'medium',
+        icon: <Mail className="w-4 h-4" />,
+        color: 'hsl(280, 65%, 60%)',
+        notes: `Envía secuencias personalizadas. Meta: 30 emails.`,
+        notesEn: `Send personalized sequences. Goal: 30 emails.`,
+      });
+      blocks.push({
+        startTime: '11:00',
+        endTime: '12:00',
+        activity: 'Llamadas de Seguimiento',
+        activityEn: 'Follow-up Calls',
+        category: 'calls',
+        priority: 'medium',
+        icon: <Phone className="w-4 h-4" />,
+        color: 'hsl(217, 91%, 60%)',
+        notes: 'Contacta leads calientes y programa reuniones.',
+        notesEn: 'Contact warm leads and schedule meetings.',
+      });
+    } else {
+      // Wednesday: Balance day with networking focus
+      blocks.push({
+        startTime: '09:00',
+        endTime: '09:30',
+        activity: 'Planificación Semanal',
+        activityEn: 'Weekly Planning',
+        category: 'admin',
+        priority: 'medium',
+        icon: <Target className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Revisa métricas y ajusta estrategia.',
+        notesEn: 'Review metrics and adjust strategy.',
+      });
+      blocks.push({
+        startTime: '09:30',
+        endTime: '10:30',
+        activity: 'LinkedIn y Networking',
+        activityEn: 'LinkedIn & Networking',
+        category: 'prospecting',
+        priority: 'medium',
+        icon: <Users className="w-4 h-4" />,
+        color: 'hsl(220, 15%, 50%)',
+        notes: 'Conecta con prospectos en redes sociales.',
+        notesEn: 'Connect with prospects on social media.',
+      });
+      blocks.push({
+        startTime: '10:30',
+        endTime: '12:00',
+        activity: 'Llamadas Mixtas',
+        activityEn: 'Mixed Calls',
+        category: 'calls',
+        priority: 'high',
+        icon: <Phone className="w-4 h-4" />,
+        color: 'hsl(217, 91%, 60%)',
+        notes: 'Combina llamadas en frío con seguimiento.',
+        notesEn: 'Combine cold calls with follow-ups.',
+      });
+    }
 
-    blocks.push({
-      startTime: '10:00',
-      endTime: '11:00',
-      activity: 'Bloque de Llamadas en Frío',
-      activityEn: 'Cold Calling Block',
-      category: 'calls',
-      priority: needsMoreCalls ? 'high' : 'medium',
-      icon: <Phone className="w-4 h-4" />,
-      color: 'hsl(217, 91%, 60%)',
-      notes: needsMoreCalls
-        ? `Tasa de conexión: ${conversionRates.callConnection.toFixed(1)}%. Prueba diferentes horarios y scripts.`
-        : `Excelente! Tu tasa de conexión es ${conversionRates.callConnection.toFixed(1)}%.`,
-      notesEn: needsMoreCalls
-        ? `Connection rate: ${conversionRates.callConnection.toFixed(1)}%. Try different times and scripts.`
-        : `Excellent! Your connection rate is ${conversionRates.callConnection.toFixed(1)}%.`,
-    });
-
-    blocks.push({
-      startTime: '11:00',
-      endTime: '12:00',
-      activity: 'Email Outreach y Seguimiento',
-      activityEn: 'Email Outreach & Follow-up',
-      category: 'emails',
-      priority: needsMoreEmails ? 'high' : 'medium',
-      icon: <Mail className="w-4 h-4" />,
-      color: 'hsl(280, 65%, 60%)',
-      notes: needsMoreEmails
-        ? `Tasa de apertura: ${conversionRates.emailOpen.toFixed(1)}%. Mejora tus asuntos y personalización.`
-        : `Bien! Tasa de apertura: ${conversionRates.emailOpen.toFixed(1)}%.`,
-      notesEn: needsMoreEmails
-        ? `Open rate: ${conversionRates.emailOpen.toFixed(1)}%. Improve your subject lines and personalization.`
-        : `Good! Open rate: ${conversionRates.emailOpen.toFixed(1)}%.`,
-    });
-
-    // Lunch break
+    // Lunch - same for all days
     blocks.push({
       startTime: '12:00',
       endTime: '13:00',
@@ -133,47 +200,117 @@ const TimeBlockingStrategy: React.FC = () => {
       notesEn: 'Rest to keep your energy high.',
     });
 
-    // Afternoon - Meetings and follow-ups
-    blocks.push({
-      startTime: '13:00',
-      endTime: '14:00',
-      activity: 'Reuniones con Prospectos',
-      activityEn: 'Prospect Meetings',
-      category: 'meetings',
-      priority: 'high',
-      icon: <Calendar className="w-4 h-4" />,
-      color: 'hsl(152, 69%, 31%)',
-      notes: `Show rate: ${conversionRates.showRate.toFixed(1)}%. ${needsFollowUp ? 'Implementa recordatorios.' : 'Mantén tu sistema de confirmación.'}`,
-      notesEn: `Show rate: ${conversionRates.showRate.toFixed(1)}%. ${needsFollowUp ? 'Implement reminders.' : 'Keep your confirmation system.'}`,
-    });
-
-    blocks.push({
-      startTime: '14:00',
-      endTime: '15:00',
-      activity: 'Segundo Bloque de Llamadas',
-      activityEn: 'Second Calling Block',
-      category: 'calls',
-      priority: needsMoreCalls ? 'high' : 'medium',
-      icon: <Phone className="w-4 h-4" />,
-      color: 'hsl(217, 91%, 60%)',
-      notes: 'Horario óptimo para decisores. Aprovecha para llamadas de seguimiento.',
-      notesEn: 'Optimal time for decision makers. Use for follow-up calls.',
-    });
-
-    blocks.push({
-      startTime: '15:00',
-      endTime: '16:00',
-      activity: 'Preparación y Administración',
-      activityEn: 'Preparation & Admin',
-      category: 'admin',
-      priority: 'medium',
-      icon: <Target className="w-4 h-4" />,
-      color: 'hsl(45, 100%, 51%)',
-      notes: 'Actualiza CRM, prepara propuestas, investiga prospectos.',
-      notesEn: 'Update CRM, prepare proposals, research prospects.',
-    });
+    // Afternoon varies by day
+    if (dayIndex === 0 || dayIndex === 2) {
+      // Monday & Wednesday: More meetings in afternoon
+      blocks.push({
+        startTime: '13:00',
+        endTime: '14:30',
+        activity: 'Reuniones con Prospectos',
+        activityEn: 'Prospect Meetings',
+        category: 'meetings',
+        priority: 'high',
+        icon: <Calendar className="w-4 h-4" />,
+        color: 'hsl(152, 69%, 31%)',
+        notes: `Bloque protegido para demos y presentaciones.`,
+        notesEn: `Protected block for demos and presentations.`,
+      });
+      blocks.push({
+        startTime: '14:30',
+        endTime: '15:30',
+        activity: 'Preparación de Propuestas',
+        activityEn: 'Proposal Preparation',
+        category: 'admin',
+        priority: 'medium',
+        icon: <Target className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Prepara y envía propuestas personalizadas.',
+        notesEn: 'Prepare and send personalized proposals.',
+      });
+    } else if (dayIndex === 1 || dayIndex === 3) {
+      // Tuesday & Thursday: Calls + quick admin
+      blocks.push({
+        startTime: '13:00',
+        endTime: '14:00',
+        activity: 'Llamadas a Decisores',
+        activityEn: 'Decision Maker Calls',
+        category: 'calls',
+        priority: 'high',
+        icon: <Phone className="w-4 h-4" />,
+        color: 'hsl(217, 91%, 60%)',
+        notes: 'Horario óptimo para contactar ejecutivos.',
+        notesEn: 'Optimal time to contact executives.',
+      });
+      blocks.push({
+        startTime: '14:00',
+        endTime: '15:00',
+        activity: 'Demo o Reunión',
+        activityEn: 'Demo or Meeting',
+        category: 'meetings',
+        priority: 'high',
+        icon: <Calendar className="w-4 h-4" />,
+        color: 'hsl(152, 69%, 31%)',
+        notes: 'Espacio para reuniones programadas.',
+        notesEn: 'Space for scheduled meetings.',
+      });
+      blocks.push({
+        startTime: '15:00',
+        endTime: '15:30',
+        activity: 'Actualización de CRM',
+        activityEn: 'CRM Update',
+        category: 'admin',
+        priority: 'low',
+        icon: <Target className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Registra todas las interacciones del día.',
+        notesEn: 'Log all interactions of the day.',
+      });
+    } else {
+      // Friday: Wrap up and planning
+      blocks.push({
+        startTime: '13:00',
+        endTime: '14:00',
+        activity: 'Seguimiento de Propuestas',
+        activityEn: 'Proposal Follow-up',
+        category: 'calls',
+        priority: 'high',
+        icon: <Phone className="w-4 h-4" />,
+        color: 'hsl(217, 91%, 60%)',
+        notes: 'Llama para dar seguimiento a propuestas enviadas.',
+        notesEn: 'Call to follow up on sent proposals.',
+      });
+      blocks.push({
+        startTime: '14:00',
+        endTime: '15:00',
+        activity: 'Revisión Semanal',
+        activityEn: 'Weekly Review',
+        category: 'admin',
+        priority: 'medium',
+        icon: <Target className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Analiza resultados y planifica la próxima semana.',
+        notesEn: 'Analyze results and plan next week.',
+      });
+      blocks.push({
+        startTime: '15:00',
+        endTime: '16:00',
+        activity: 'Aprendizaje y Desarrollo',
+        activityEn: 'Learning & Development',
+        category: 'admin',
+        priority: 'low',
+        icon: <TrendingUp className="w-4 h-4" />,
+        color: 'hsl(45, 100%, 51%)',
+        notes: 'Lee artículos, toma cursos, mejora tus habilidades.',
+        notesEn: 'Read articles, take courses, improve your skills.',
+      });
+    }
 
     return blocks;
+  };
+
+  // Use day 0 (Monday) as the base for single-block display
+  const timeBlocks = useMemo((): TimeBlock[] => {
+    return generateDayBlocks(0);
   }, [conversionRates]);
 
   // Generate recommendations
@@ -375,18 +512,23 @@ const TimeBlockingStrategy: React.FC = () => {
     const lastY = gridStartY + headerHeight + (timeSlots.length * hourHeight);
     doc.line(gridStartX, lastY, pageWidth - 25, lastY);
 
-    // Draw time blocks on each day
+    // Draw time blocks on each day - now with varied blocks per day
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(7);
     
     weekDays.forEach((day, dayIndex) => {
-      timeBlocks.forEach((block) => {
+      const dayBlocks = generateDayBlocks(dayIndex);
+      dayBlocks.forEach((block) => {
         const startHour = parseInt(block.startTime.split(':')[0]);
+        const startMin = parseInt(block.startTime.split(':')[1]) || 0;
         const endHour = parseInt(block.endTime.split(':')[0]);
-        const duration = endHour - startHour;
+        const endMin = parseInt(block.endTime.split(':')[1]) || 0;
+        const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+        const duration = durationMinutes / 60;
         
         const x = gridStartX + (dayIndex * dayWidth) + 2;
-        const y = gridStartY + headerHeight + ((startHour - 8) * hourHeight) + 2;
+        const yOffset = (startHour - 8) + (startMin / 60);
+        const y = gridStartY + headerHeight + (yOffset * hourHeight) + 2;
         const width = dayWidth - 4;
         const height = (duration * hourHeight) - 4;
         
@@ -445,10 +587,30 @@ const TimeBlockingStrategy: React.FC = () => {
     const [endHour, endMin] = block.endTime.split(':').map(Number);
     
     const startDate = new Date(today);
-    startDate.setHours(startHour, startMin, 0, 0);
+    startDate.setHours(startHour, startMin || 0, 0, 0);
     
     const endDate = new Date(today);
-    endDate.setHours(endHour, endMin, 0, 0);
+    endDate.setHours(endHour, endMin || 0, 0, 0);
+    
+    const formatDate = (date: Date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const title = encodeURIComponent(language === 'es' ? block.activity : block.activityEn);
+    const details = encodeURIComponent(language === 'es' ? block.notes : block.notesEn);
+    
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${details}`;
+  };
+
+  // Generate calendar URL for a specific day
+  const generateGoogleCalendarUrlForDay = (block: TimeBlock, dayIndex: number) => {
+    const targetDate = weekDays[dayIndex].fullDate;
+    const [startHour, startMin] = block.startTime.split(':').map(Number);
+    const [endHour, endMin] = block.endTime.split(':').map(Number);
+    
+    const startDate = new Date(targetDate);
+    startDate.setHours(startHour, startMin || 0, 0, 0);
+    
+    const endDate = new Date(targetDate);
+    endDate.setHours(endHour, endMin || 0, 0, 0);
     
     const formatDate = (date: Date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
     
@@ -464,10 +626,10 @@ const TimeBlockingStrategy: React.FC = () => {
     const [endHour, endMin] = block.endTime.split(':').map(Number);
     
     const startDate = new Date(today);
-    startDate.setHours(startHour, startMin, 0, 0);
+    startDate.setHours(startHour, startMin || 0, 0, 0);
     
     const endDate = new Date(today);
-    endDate.setHours(endHour, endMin, 0, 0);
+    endDate.setHours(endHour, endMin || 0, 0, 0);
     
     const title = encodeURIComponent(language === 'es' ? block.activity : block.activityEn);
     const body = encodeURIComponent(language === 'es' ? block.notes : block.notesEn);
@@ -475,11 +637,17 @@ const TimeBlockingStrategy: React.FC = () => {
     return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${startDate.toISOString()}&enddt=${endDate.toISOString()}&body=${body}`;
   };
 
+  // Add all blocks for the week to Google Calendar
   const addAllToGoogleCalendar = () => {
-    timeBlocks.forEach((block, index) => {
-      setTimeout(() => {
-        window.open(generateGoogleCalendarUrl(block), '_blank');
-      }, index * 500);
+    let eventIndex = 0;
+    weekDays.forEach((day, dayIndex) => {
+      const dayBlocks = generateDayBlocks(dayIndex);
+      dayBlocks.forEach((block) => {
+        setTimeout(() => {
+          window.open(generateGoogleCalendarUrlForDay(block, dayIndex), '_blank');
+        }, eventIndex * 600);
+        eventIndex++;
+      });
     });
   };
 
@@ -645,6 +813,23 @@ const TimeBlockingStrategy: React.FC = () => {
             </div>
           </div>
 
+          {/* Disclaimer */}
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  {language === 'es' ? 'Nota importante' : 'Important note'}
+                </p>
+                <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                  {language === 'es' 
+                    ? 'Esta estrategia es una sugerencia basada en mejores prácticas de ventas. Adapta los bloques según tu industria, clientes y estilo personal. Lo importante es mantener consistencia y medir resultados.'
+                    : 'This strategy is a suggestion based on sales best practices. Adapt the blocks according to your industry, clients, and personal style. The important thing is to maintain consistency and measure results.'}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Weekly Calendar View */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -666,7 +851,7 @@ const TimeBlockingStrategy: React.FC = () => {
                   ))}
                 </div>
                 
-                {/* Time slots grid */}
+                {/* Time slots grid - now with varied blocks per day */}
                 <div className="relative">
                   {timeSlots.map((time, timeIndex) => (
                     <div key={timeIndex} className="grid grid-cols-[60px_repeat(5,1fr)] border-b border-border" style={{ height: '70px' }}>
@@ -675,28 +860,33 @@ const TimeBlockingStrategy: React.FC = () => {
                       </div>
                       {weekDays.map((day, dayIndex) => {
                         const slotHour = parseInt(time.split(' ')[0]) + (time.includes('PM') && !time.includes('12') ? 12 : 0);
-                        const blockInSlot = timeBlocks.find(block => {
+                        // Get blocks specific to this day
+                        const dayBlocks = generateDayBlocks(dayIndex);
+                        const blockInSlot = dayBlocks.find(block => {
                           const blockHour = parseInt(block.startTime.split(':')[0]);
                           return blockHour === slotHour || (slotHour === 12 && blockHour === 12);
                         });
                         
                         if (blockInSlot) {
                           const startHour = parseInt(blockInSlot.startTime.split(':')[0]);
+                          const startMin = parseInt(blockInSlot.startTime.split(':')[1]) || 0;
                           const endHour = parseInt(blockInSlot.endTime.split(':')[0]);
-                          const duration = endHour - startHour;
+                          const endMin = parseInt(blockInSlot.endTime.split(':')[1]) || 0;
+                          const durationMinutes = (endHour * 60 + endMin) - (startHour * 60 + startMin);
+                          const heightPx = (durationMinutes / 60) * 70 - 8;
                           const colors = getCategoryColor(blockInSlot.category);
                           
                           return (
                             <div key={dayIndex} className="border-l border-border p-1 relative">
                               <a
-                                href={generateGoogleCalendarUrl(blockInSlot)}
+                                href={generateGoogleCalendarUrlForDay(blockInSlot, dayIndex)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="block rounded-lg p-2 h-full cursor-pointer hover:opacity-90 transition-opacity"
                                 style={{ 
                                   backgroundColor: colors.bg,
                                   color: colors.text,
-                                  height: `${duration * 70 - 8}px`,
+                                  height: `${heightPx}px`,
                                 }}
                               >
                                 <div className="text-xs font-semibold truncate">
@@ -725,7 +915,7 @@ const TimeBlockingStrategy: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded" style={{ backgroundColor: '#f97316' }}></div>
                 <span className="text-sm text-muted-foreground">
-                  {language === 'es' ? 'Llamadas/Reuniones' : 'Calls/Meetings'}
+                  {language === 'es' ? 'Prospección/Llamadas/Reuniones' : 'Prospecting/Calls/Meetings'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -742,12 +932,21 @@ const TimeBlockingStrategy: React.FC = () => {
               </div>
             </div>
 
-            {/* Tip */}
-            <p className="text-xs text-muted-foreground">
-              💡 {language === 'es' 
-                ? 'Haz clic en cualquier bloque para agregarlo a Google Calendar' 
-                : 'Click on any block to add it to Google Calendar'}
-            </p>
+            {/* Tips */}
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span>💡</span>
+                {language === 'es' 
+                  ? 'Haz clic en cualquier bloque para agregarlo a Google Calendar con la fecha correcta' 
+                  : 'Click on any block to add it to Google Calendar with the correct date'}
+              </p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span>📅</span>
+                {language === 'es' 
+                  ? 'El horario varía por día para evitar la monotonía y mantener energía' 
+                  : 'The schedule varies by day to avoid monotony and maintain energy'}
+              </p>
+            </div>
           </div>
 
           {/* Recommendations */}
