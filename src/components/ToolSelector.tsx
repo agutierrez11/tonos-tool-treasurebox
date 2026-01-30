@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp, Download, Circle, Filter } from "lucide-react";
+import { GraduationCap, Briefcase, Award, X, ChevronDown, ChevronUp, Download, Circle, Filter, Check, Square, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getFilteredTools, categories, type Level, type Tool, type Pricing, type FunnelStage } from "@/data/tools";
 import ToolDetailSheet from "./ToolDetailSheet";
@@ -13,6 +13,8 @@ const ToolSelector = () => {
   const [selectedFunnelStage, setSelectedFunnelStage] = useState<FunnelStage | null>(null);
   const [selectedPricing, setSelectedPricing] = useState<Pricing | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [manualSelection, setManualSelection] = useState<string[]>([]);
+  const [selectionMode, setSelectionMode] = useState<"filtered" | "manual">("filtered");
 
   const levels = [
     { id: "beginner" as Level, icon: GraduationCap, label: { es: "Principiante", en: "Beginner" } },
@@ -35,20 +37,24 @@ const ToolSelector = () => {
 
   const handleLevelClick = (level: Level) => {
     setSelectedLevel(selectedLevel === level ? null : level);
+    setSelectionMode("filtered");
   };
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategories(prev => 
       prev.includes(categoryId) ? prev.filter(c => c !== categoryId) : [...prev, categoryId]
     );
+    setSelectionMode("filtered");
   };
 
   const handleFunnelClick = (stage: FunnelStage) => {
     setSelectedFunnelStage(selectedFunnelStage === stage ? null : stage);
+    setSelectionMode("filtered");
   };
 
   const handlePricingClick = (pricing: Pricing) => {
     setSelectedPricing(selectedPricing === pricing ? null : pricing);
+    setSelectionMode("filtered");
   };
 
   const clearFilters = () => {
@@ -56,6 +62,27 @@ const ToolSelector = () => {
     setSelectedCategories([]);
     setSelectedFunnelStage(null);
     setSelectedPricing(null);
+    setManualSelection([]);
+    setSelectionMode("filtered");
+  };
+
+  const toggleToolSelection = (toolId: string) => {
+    setManualSelection(prev => 
+      prev.includes(toolId) ? prev.filter(id => id !== toolId) : [...prev, toolId]
+    );
+    setSelectionMode("manual");
+  };
+
+  const selectAllFiltered = () => {
+    const toolIds = filteredTools.map(t => t.id);
+    setManualSelection(prev => {
+      const allSelected = toolIds.every(id => prev.includes(id));
+      if (allSelected) {
+        return prev.filter(id => !toolIds.includes(id));
+      }
+      return [...new Set([...prev, ...toolIds])];
+    });
+    setSelectionMode("manual");
   };
 
   // Get tools filtered by all criteria
@@ -74,6 +101,18 @@ const ToolSelector = () => {
 
   const filteredTools = getFilteredResults();
   const hasSelection = selectedLevel || selectedCategories.length > 0 || selectedFunnelStage || selectedPricing;
+  
+  // Get tools for export based on mode
+  const getToolsForExport = (): Tool[] => {
+    if (selectionMode === "manual" && manualSelection.length > 0) {
+      const allTools = getFilteredTools([], null);
+      return allTools.filter(t => manualSelection.includes(t.id));
+    }
+    return filteredTools;
+  };
+
+  const toolsForExport = getToolsForExport();
+  const allFilteredSelected = filteredTools.length > 0 && filteredTools.every(t => manualSelection.includes(t.id));
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-3 px-3">
@@ -102,7 +141,7 @@ const ToolSelector = () => {
           );
         })}
         
-        {hasSelection && (
+        {(hasSelection || manualSelection.length > 0) && (
           <button
             onClick={clearFilters}
             className="p-1 text-muted-foreground hover:text-foreground transition-colors rounded hover:bg-muted"
@@ -200,9 +239,9 @@ const ToolSelector = () => {
       {/* Results */}
       {hasSelection && (
         <div className="space-y-2 animate-fade-in bg-card/50 rounded-lg p-3 border border-border/30">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-foreground">{filteredTools.length}</span> {language === "es" ? "herramientas en tu stack" : "tools in your stack"}
+              <span className="font-semibold text-foreground">{filteredTools.length}</span> {language === "es" ? "herramientas encontradas" : "tools found"}
               {selectedLevel && (
                 <span className="text-primary font-medium ml-1">
                   • {levels.find(l => l.id === selectedLevel)?.label[language]}
@@ -214,35 +253,82 @@ const ToolSelector = () => {
                 </span>
               )}
             </p>
+            
             {filteredTools.length > 0 && (
-              <div className="flex items-center gap-1 text-xs text-primary">
-                <Download className="w-3 h-3" />
-                {language === "es" ? "Exportar abajo" : "Export below"}
-              </div>
+              <button
+                onClick={selectAllFiltered}
+                className={cn(
+                  "flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors",
+                  allFilteredSelected 
+                    ? "bg-primary/10 text-primary" 
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {allFilteredSelected ? <CheckSquare className="w-3 h-3" /> : <Square className="w-3 h-3" />}
+                {language === "es" ? "Seleccionar todas" : "Select all"}
+              </button>
             )}
           </div>
           
           {filteredTools.length > 0 && (
             <>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5">
-                {filteredTools.slice(0, 18).map((tool, index) => (
-                  <ToolResultCard key={tool.id} tool={tool} index={index} language={language} />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1.5">
+                {filteredTools.slice(0, 20).map((tool, index) => (
+                  <ToolResultCard 
+                    key={tool.id} 
+                    tool={tool} 
+                    index={index} 
+                    language={language}
+                    isSelected={manualSelection.includes(tool.id)}
+                    onToggleSelect={() => toggleToolSelection(tool.id)}
+                  />
                 ))}
               </div>
               
-              {filteredTools.length > 18 && (
+              {filteredTools.length > 20 && (
                 <p className="text-center text-[10px] text-muted-foreground">
-                  +{filteredTools.length - 18} {language === "es" ? "más en el PDF/Excel" : "more in PDF/Excel"}
+                  +{filteredTools.length - 20} {language === "es" ? "más" : "more"}
                 </p>
               )}
+            </>
+          )}
+          
+          {/* Export section */}
+          {toolsForExport.length > 0 && (
+            <div className="pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Download className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-medium">
+                    {language === "es" ? "Exportar:" : "Export:"}
+                  </span>
+                  <span className={cn(
+                    "text-xs px-2 py-0.5 rounded-full",
+                    selectionMode === "manual" && manualSelection.length > 0
+                      ? "bg-primary/10 text-primary"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    {selectionMode === "manual" && manualSelection.length > 0
+                      ? `${manualSelection.length} ${language === "es" ? "seleccionadas" : "selected"}`
+                      : `${filteredTools.length} ${language === "es" ? "filtradas" : "filtered"}`
+                    }
+                  </span>
+                </div>
+              </div>
               
-              {/* Export section */}
               <TechStackExport 
-                tools={filteredTools} 
+                tools={toolsForExport} 
                 level={selectedLevel} 
                 selectedCategories={selectedCategories} 
               />
-            </>
+              
+              <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                {language === "es" 
+                  ? "💡 Haz clic en los checks para seleccionar herramientas manualmente"
+                  : "💡 Click checkboxes to manually select tools"
+                }
+              </p>
+            </div>
           )}
         </div>
       )}
@@ -254,6 +340,8 @@ interface ToolResultCardProps {
   tool: Tool;
   index: number;
   language: "es" | "en";
+  isSelected: boolean;
+  onToggleSelect: () => void;
 }
 
 const pricingConfig: Record<Pricing, { color: string }> = {
@@ -262,28 +350,53 @@ const pricingConfig: Record<Pricing, { color: string }> = {
   paid: { color: "bg-rose-500" },
 };
 
-const ToolResultCard = ({ tool, index, language }: ToolResultCardProps) => {
+const ToolResultCard = ({ tool, index, language, isSelected, onToggleSelect }: ToolResultCardProps) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pricing = pricingConfig[tool.pricing];
   
   return (
     <>
-      <button
-        onClick={() => setIsSheetOpen(true)}
-        className="group relative flex items-center gap-1.5 p-1.5 rounded-md bg-background border border-border/50 hover:border-primary/40 hover:shadow-sm transition-all w-full text-left"
+      <div
+        className={cn(
+          "group relative flex items-center gap-1.5 p-1.5 rounded-md bg-background border transition-all",
+          isSelected 
+            ? "border-primary/60 bg-primary/5 shadow-sm" 
+            : "border-border/50 hover:border-primary/40 hover:shadow-sm"
+        )}
         style={{ animationDelay: `${index * 15}ms` }}
       >
+        {/* Selection checkbox */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSelect();
+          }}
+          className={cn(
+            "w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+            isSelected 
+              ? "bg-primary text-primary-foreground" 
+              : "bg-muted hover:bg-muted/80"
+          )}
+        >
+          {isSelected && <Check className="w-3 h-3" />}
+        </button>
+        
         <div className={cn("absolute top-1 right-1 w-1.5 h-1.5 rounded-full", pricing.color)} />
         
-        <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
-          <span className="text-[10px] font-semibold text-primary">
-            {tool.name.charAt(0)}
+        <button
+          onClick={() => setIsSheetOpen(true)}
+          className="flex-1 flex items-center gap-1 text-left min-w-0"
+        >
+          <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] font-semibold text-primary">
+              {tool.name.charAt(0)}
+            </span>
+          </div>
+          <span className="text-[10px] font-medium text-foreground truncate group-hover:text-primary transition-colors pr-3">
+            {tool.name}
           </span>
-        </div>
-        <span className="text-[10px] font-medium text-foreground truncate group-hover:text-primary transition-colors pr-2">
-          {tool.name}
-        </span>
-      </button>
+        </button>
+      </div>
       
       <ToolDetailSheet 
         tool={tool} 
