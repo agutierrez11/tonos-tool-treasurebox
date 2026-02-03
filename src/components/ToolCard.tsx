@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import type { Tool, Pricing } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
-import ToolDetailSheet from "./ToolDetailSheet";
+import ToolDetailDialog from "./ToolDetailDialog";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -44,14 +44,14 @@ interface ToolCardProps {
 }
 
 const ToolCard = ({ tool, index }: ToolCardProps) => {
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const IconComponent = getIcon(tool.icon);
   const { language } = useLanguage();
 
   return (
     <>
       <button
-        onClick={() => setIsSheetOpen(true)}
+        onClick={() => setIsDialogOpen(true)}
         className="group block w-full text-left"
         style={{ animationDelay: `${index * 25}ms` }}
       >
@@ -84,10 +84,10 @@ const ToolCard = ({ tool, index }: ToolCardProps) => {
         </div>
       </button>
       
-      <ToolDetailSheet 
+      <ToolDetailDialog 
         tool={tool} 
-        open={isSheetOpen} 
-        onOpenChange={setIsSheetOpen} 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen} 
       />
     </>
   );
