@@ -49,6 +49,7 @@ export const categories: Category[] = [
   { id: "integrations", name: { es: "Integraciones", en: "Integrations" }, icon: "Zap", color: "from-amber-500 to-yellow-500" },
   { id: "education", name: { es: "Educación y Cursos", en: "Education & Courses" }, icon: "GraduationCap", color: "from-blue-500 to-indigo-500" },
   { id: "productivity", name: { es: "Productividad", en: "Productivity" }, icon: "Zap", color: "from-yellow-500 to-orange-500" },
+  { id: "voip-calls", name: { es: "Llamadas VoIP/IP", en: "VoIP/IP Calls" }, icon: "Phone", color: "from-green-500 to-teal-500" },
 ];
 
 export const tools: Tool[] = [
@@ -409,6 +410,18 @@ export const tools: Tool[] = [
   { id: "notta", name: "Notta", description: { es: "Transcripción de audio a texto en tiempo real", en: "Real-time audio to text transcription" }, url: "https://www.notta.ai/", icon: "Mic", categoryId: "transcription", needs: ["content", "automation"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "mofu" },
   { id: "assemblyai", name: "AssemblyAI", description: { es: "API de transcripción y análisis de audio con IA", en: "AI audio transcription and analysis API" }, url: "https://www.assemblyai.com/", icon: "Code", categoryId: "transcription", needs: ["automation", "analytics"], levels: ["senior"], pricing: "freemium", funnelStage: "allinone" },
   { id: "grain", name: "Grain", description: { es: "Graba y transcribe videollamadas automáticamente", en: "Record and transcribe video calls automatically" }, url: "https://grain.com/", icon: "Video", categoryId: "transcription", needs: ["automation", "content"], levels: ["junior", "senior"], pricing: "freemium", funnelStage: "bofu" },
+
+  // VoIP/IP CALLS - MOFU & BOFU (sales calls)
+  { id: "aircall", name: "Aircall", description: { es: "Sistema telefónico en la nube para equipos de ventas y soporte", en: "Cloud phone system for sales and support teams" }, url: "https://aircall.io/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+  { id: "dialpad", name: "Dialpad", description: { es: "Comunicaciones empresariales con IA integrada", en: "Business communications with built-in AI" }, url: "https://www.dialpad.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+  { id: "ringcentral", name: "RingCentral", description: { es: "Plataforma completa de comunicaciones unificadas", en: "Complete unified communications platform" }, url: "https://www.ringcentral.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "analytics"], levels: ["senior"], pricing: "paid", funnelStage: "allinone" },
+  { id: "justcall", name: "JustCall", description: { es: "Sistema telefónico VoIP para ventas y equipos remotos", en: "VoIP phone system for sales and remote teams" }, url: "https://justcall.io/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "prospecting"], levels: ["beginner", "junior", "senior"], pricing: "freemium", funnelStage: "mofu" },
+  { id: "cloudtalk", name: "CloudTalk", description: { es: "Software de call center en la nube para equipos de ventas", en: "Cloud call center software for sales teams" }, url: "https://www.cloudtalk.io/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
+  { id: "grasshopper", name: "Grasshopper", description: { es: "Sistema telefónico virtual para pequeños negocios", en: "Virtual phone system for small businesses" }, url: "https://grasshopper.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation"], levels: ["beginner", "junior"], pricing: "paid", funnelStage: "mofu" },
+  { id: "phoneburner", name: "PhoneBurner", description: { es: "Power dialer para ventas outbound de alto volumen", en: "Power dialer for high-volume outbound sales" }, url: "https://www.phoneburner.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "prospecting"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "tofu" },
+  { id: "toky", name: "Toky", description: { es: "Sistema telefónico empresarial con integraciones de CRM", en: "Business phone system with CRM integrations" }, url: "https://toky.co/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "analytics"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "mofu" },
+  { id: "openphone", name: "OpenPhone", description: { es: "Teléfono empresarial moderno para startups y equipos", en: "Modern business phone for startups and teams" }, url: "https://www.openphone.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation"], levels: ["beginner", "junior"], pricing: "freemium", funnelStage: "mofu" },
+  { id: "kixie", name: "Kixie", description: { es: "Power dialer con IA para equipos de ventas", en: "AI-powered power dialer for sales teams" }, url: "https://www.kixie.com/", icon: "Phone", categoryId: "voip-calls", needs: ["automation", "prospecting", "analytics"], levels: ["junior", "senior"], pricing: "paid", funnelStage: "bofu" },
 ];
 
 export const getToolsByCategory = (categoryId: string): Tool[] => {
