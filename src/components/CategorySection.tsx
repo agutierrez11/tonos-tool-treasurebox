@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LucideIcon, ChevronDown, Circle } from "lucide-react";
 import {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic, Phone
 } from "lucide-react";
 import { getToolsByCategory, type Category, type Pricing } from "@/data/tools";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
   Mail, MailCheck, PenTool, BarChart3, Share2, Target, Users, Sparkles, Image,
-  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic
+  GraduationCap, Zap, Folder, Video, Flame, Bot, Cog, DatabaseBackup, Mic, Phone
 };
 
 const pricingColors: Record<Pricing, string> = {
