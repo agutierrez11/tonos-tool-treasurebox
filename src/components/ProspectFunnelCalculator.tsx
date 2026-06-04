@@ -534,35 +534,35 @@ const ProspectFunnelCalculator: React.FC = () => {
                     {language === 'es' ? 'Visualización del Embudo' : 'Funnel Visualization'}
                   </h3>
                   
-                  <div className="space-y-3">
-                    {funnelStages.map((stage, index) => (
-                      <div key={stage.id} className="flex flex-col items-center">
-                        <div
-                          className="relative flex items-center justify-between px-4 py-3 rounded-lg text-white transition-all duration-500 min-h-[50px]"
-                          style={{
-                            backgroundColor: stage.color,
-                            width: getFunnelWidth(stage.value),
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            {stage.icon}
-                            <span className="font-medium text-sm truncate">{stage.name}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            {stage.conversionRate !== undefined && (
-                              <span className="text-xs opacity-80">
-                                {stage.conversionRate.toFixed(1)}%
-                              </span>
-                            )}
-                            <span className="font-bold text-lg">{stage.value}</span>
-                          </div>
+                <div className="space-y-4">
+                  {funnelStages.map((stage) => (
+                    <div key={stage.id} className="space-y-1.5">
+                      <div className="flex justify-between items-center text-sm">
+                        <div className="flex items-center gap-2 text-foreground font-medium">
+                          <span className="text-muted-foreground">{stage.icon}</span>
+                          <span>{stage.name}</span>
                         </div>
-                        {index < funnelStages.length - 1 && (
-                          <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[8px] border-l-transparent border-r-transparent border-t-muted-foreground/30 my-1" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          {stage.conversionRate !== undefined && (
+                            <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                              {stage.conversionRate.toFixed(1)}%
+                            </span>
+                          )}
+                          <span className="font-bold text-foreground">{stage.value.toLocaleString()}</span>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                      <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{ 
+                            backgroundColor: stage.color,
+                            width: getFunnelWidth(stage.value)
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 </div>
 
                 {/* Diagnosis */}

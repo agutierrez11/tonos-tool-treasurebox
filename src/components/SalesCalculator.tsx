@@ -784,69 +784,110 @@ const SalesCalculator = () => {
                 </h3>
                 
                 {/* Visual Funnel */}
-                <div className="space-y-2">
+                <div className="space-y-4 bg-card/30 p-4 rounded-xl border border-border/50">
                   {/* Leads Stage */}
-                  <div 
-                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
-                    style={{ 
-                      backgroundColor: FUNNEL_COLORS.leads,
-                      width: '100%'
-                    }}
-                  >
-                    <span className="text-sm font-medium text-white">{language === "es" ? "Leads" : "Leads"}</span>
-                    <span className="text-lg font-bold text-white">{results.leads.toLocaleString()}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-foreground">{language === "es" ? "Leads" : "Leads"}</span>
+                      <span className="font-bold text-foreground">{results.leads.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: FUNNEL_COLORS.leads,
+                          width: '100%'
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Reuniones Agendadas Stage */}
-                  <div 
-                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
-                    style={{ 
-                      backgroundColor: FUNNEL_COLORS.reunionesAgendadas,
-                      width: `${getFunnelWidth(results.reunionesAgendadas)}%`
-                    }}
-                  >
-                    <span className="text-sm font-medium text-white">{text.reunionesAgendadas}</span>
-                    <span className="text-xs text-white/80 mx-2">{conversionRates.leadReunion}%</span>
-                    <span className="text-lg font-bold text-white">{results.reunionesAgendadas.toLocaleString()}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-foreground">{text.reunionesAgendadas}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                          {conversionRates.leadReunion}%
+                        </span>
+                        <span className="font-bold text-foreground">{results.reunionesAgendadas.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: FUNNEL_COLORS.reunionesAgendadas,
+                          width: `${getFunnelWidth(results.reunionesAgendadas)}%`
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Reuniones Realizadas Stage */}
-                  <div 
-                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
-                    style={{ 
-                      backgroundColor: FUNNEL_COLORS.reunionesRealizadas,
-                      width: `${getFunnelWidth(results.reuniones)}%`
-                    }}
-                  >
-                    <span className="text-sm font-medium text-white">{text.reuniones}</span>
-                    <span className="text-xs text-white/80 mx-2">{inputs.reunionAsistencia}%</span>
-                    <span className="text-lg font-bold text-white">{results.reuniones.toLocaleString()}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-foreground">{text.reuniones}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                          {inputs.reunionAsistencia}%
+                        </span>
+                        <span className="font-bold text-foreground">{results.reuniones.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: FUNNEL_COLORS.reunionesRealizadas,
+                          width: `${getFunnelWidth(results.reuniones)}%`
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Oportunidades Stage */}
-                  <div 
-                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
-                    style={{ 
-                      backgroundColor: FUNNEL_COLORS.oportunidades,
-                      width: `${getFunnelWidth(results.oportunidades)}%`
-                    }}
-                  >
-                    <span className="text-sm font-medium text-white">{language === "es" ? "Oportunidades" : "Opportunities"}</span>
-                    <span className="text-xs text-white/80 mx-2">{inputs.reunionOportunidad}%</span>
-                    <span className="text-lg font-bold text-white">{results.oportunidades.toLocaleString()}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-foreground">{language === "es" ? "Oportunidades" : "Opportunities"}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                          {inputs.reunionOportunidad}%
+                        </span>
+                        <span className="font-bold text-foreground">{results.oportunidades.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: FUNNEL_COLORS.oportunidades,
+                          width: `${getFunnelWidth(results.oportunidades)}%`
+                        }}
+                      />
+                    </div>
                   </div>
 
                   {/* Cierres Stage */}
-                  <div 
-                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
-                    style={{ 
-                      backgroundColor: FUNNEL_COLORS.cierres,
-                      width: `${getFunnelWidth(results.cierres)}%`
-                    }}
-                  >
-                    <span className="text-sm font-medium text-white">{language === "es" ? "Cierres" : "Closes"}</span>
-                    <span className="text-xs text-white/80 mx-2">{inputs.oportunidadCierre}%</span>
-                    <span className="text-lg font-bold text-white">{results.cierres}</span>
+                  <div className="space-y-1.5">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="font-medium text-foreground">{language === "es" ? "Cierres" : "Closes"}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded font-medium">
+                          {inputs.oportunidadCierre}%
+                        </span>
+                        <span className="font-bold text-foreground">{results.cierres}</span>
+                      </div>
+                    </div>
+                    <div className="w-full bg-secondary/30 h-3 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ 
+                          backgroundColor: FUNNEL_COLORS.cierres,
+                          width: `${getFunnelWidth(results.cierres)}%`
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
