@@ -31,6 +31,7 @@ interface CalculatorInputs {
   ticketPromedio: number;
   leadContacto: number;         // % Lead a Contacto Calificado
   contactoReunion: number;      // % Lead a Reunión
+  reunionAsistencia: number;    // % Show Rate (Tasa de Asistencia)
   reunionOportunidad: number;   // % Reunión → Oportunidad
   oportunidadCierre: number;    // % Oportunidad → Cierre
 }
@@ -38,7 +39,8 @@ interface CalculatorInputs {
 interface CalculatorResults {
   cierres: number;
   oportunidades: number;
-  reuniones: number;
+  reuniones: number; // Reuniones Realizadas (attended)
+  reunionesAgendadas: number; // Reuniones Agendadas (scheduled)
   leads: number;
   ingresos: number;
   conversionTotal: number;
@@ -48,6 +50,7 @@ interface CalculatorResults {
 const benchmarks = {
   leadContacto: { min: 30, max: 60 },
   contactoReunion: { min: 20, max: 40 },
+  reunionAsistencia: { min: 60, max: 80 },
   reunionOportunidad: { min: 25, max: 50 },
   oportunidadCierre: { min: 20, max: 30 },
 };
@@ -55,7 +58,8 @@ const benchmarks = {
 // Colores del embudo - de más claro a más oscuro
 const FUNNEL_COLORS = {
   leads: "hsl(215, 20%, 45%)",
-  reuniones: "hsl(45, 93%, 47%)",
+  reunionesAgendadas: "hsl(45, 93%, 47%)",
+  reunionesRealizadas: "hsl(283, 67%, 53%)",
   oportunidades: "hsl(211, 100%, 50%)",
   cierres: "hsl(142, 71%, 35%)",
 };
@@ -71,6 +75,7 @@ const SalesCalculator = () => {
     ticketPromedio: 15000,
     leadContacto: 35,
     contactoReunion: 30,
+    reunionAsistencia: 75,
     reunionOportunidad: 40,
     oportunidadCierre: 25,
   });
@@ -79,6 +84,7 @@ const SalesCalculator = () => {
     cierres: 0,
     oportunidades: 0,
     reuniones: 0,
+    reunionesAgendadas: 0,
     leads: 0,
     ingresos: 0,
     conversionTotal: 0,
@@ -141,21 +147,31 @@ const SalesCalculator = () => {
       ticketPromedio: "Ticket Promedio Anual ($)",
       leadContacto: "% Lead a Contacto Calificado",
       contactoReunion: "% Lead a Reunión",
+      reunionAsistencia: "% Tasa de Asistencia (Show Rate)",
       reunionOportunidad: "% Reunión a Oportunidad",
       oportunidadCierre: "% Oportunidad a Cierre",
       cierres: "Ventas a Cerrar",
       oportunidades: "Oportunidades",
-      reuniones: "Reuniones",
+      reuniones: "Reuniones Realizadas",
+      reunionesAgendadas: "Reuniones Agendadas",
       leads: "Leads Necesarios",
       ingresos: "Proyección",
       conversionTotal: "Conversión Total",
       benchmark: "Benchmark",
+      pacingTitle: "⚡ Paso Operativo Diario y Semanal (Pacing)",
+      pacingSubtitle: "Calculado sobre 20 días hábiles (Lunes a Viernes) para metas mensuales",
+      pacingLeads: "Leads diarios",
+      pacingMeetings: "Agendadas por semana",
+      pacingAttended: "Realizadas por semana",
+      pacingOpps: "Oportunidades por semana",
+      pacingCloses: "Cierres por semana",
       conclusion: (leads: number, cierres: number, period: string) =>
         `Para alcanzar tu meta de ${cierres} cierre(s) ${period}, necesitas generar aproximadamente ${leads} leads.`,
       healthyFunnel: "¡Excelentes métricas! Tu embudo se ve saludable en comparación con los benchmarks.",
       tooltips: {
         leadContacto: "Porcentaje de leads que se convierten en contactos calificados. Meta: 30-60%",
         contactoReunion: "De los contactos calificados, % que acepta una reunión. Meta: 20-40%",
+        reunionAsistencia: "Porcentaje de reuniones agendadas que se realizan con éxito. Meta: 60-80%",
         reunionOportunidad: "% de reuniones que se convierten en oportunidades calificadas. Meta: 25-50%",
         oportunidadCierre: "% de oportunidades que se cierran. Meta: 20-30%",
       },
@@ -163,6 +179,7 @@ const SalesCalculator = () => {
         title: "Diagnóstico de Optimización",
         leadContacto: "Baja conversión Lead → Contacto: Revisa la calidad de tus leads, los canales de adquisición o la base de datos.",
         contactoReunion: "Baja conversión Contacto → Reunión: Problema con el pitch inicial o la audiencia objetivo.",
+        reunionAsistencia: "Baja Tasa de Asistencia (Show Rate): Mejora el proceso de confirmación y recordatorios por email/WhatsApp antes de la llamada.",
         reunionOportunidad: "Baja conversión Reunión → Oportunidad: Estás hablando con personas sin BANT (Budget, Authority, Need, Timing).",
         oportunidadCierre: "Baja conversión Oportunidad → Cierre: Problemas de precio, competencia o falta de urgencia.",
       },
@@ -224,21 +241,31 @@ const SalesCalculator = () => {
       ticketPromedio: "Average Annual Ticket ($)",
       leadContacto: "% Lead to Qualified Contact",
       contactoReunion: "% Lead to Meeting",
+      reunionAsistencia: "% Attendance Rate (Show Rate)",
       reunionOportunidad: "% Meeting to Opportunity",
       oportunidadCierre: "% Opportunity to Close",
       cierres: "Sales to Close",
       oportunidades: "Opportunities",
-      reuniones: "Meetings",
+      reuniones: "Attended Meetings",
+      reunionesAgendadas: "Scheduled Meetings",
       leads: "Leads Needed",
       ingresos: "Projection",
       conversionTotal: "Total Conversion",
       benchmark: "Benchmark",
+      pacingTitle: "⚡ Daily & Weekly Operational Pacing",
+      pacingSubtitle: "Calculated based on 20 working days per month (Mon-Fri) for monthly goals",
+      pacingLeads: "Daily Leads",
+      pacingMeetings: "Scheduled / week",
+      pacingAttended: "Attended / week",
+      pacingOpps: "Opps / week",
+      pacingCloses: "Closes / week",
       conclusion: (leads: number, cierres: number, period: string) =>
         `To reach your goal of ${cierres} close(s) ${period}, you need to generate approximately ${leads} leads.`,
       healthyFunnel: "Excellent metrics! Your funnel looks healthy compared to benchmarks.",
       tooltips: {
         leadContacto: "Percentage of leads that convert to qualified contacts. Target: 30-60%",
         contactoReunion: "Of qualified contacts, % that accept a meeting. Target: 20-40%",
+        reunionAsistencia: "Percentage of scheduled meetings that actually take place. Target: 60-80%",
         reunionOportunidad: "% of meetings that become qualified opportunities. Target: 25-50%",
         oportunidadCierre: "% of opportunities that close. Target: 20-30%",
       },
@@ -246,6 +273,7 @@ const SalesCalculator = () => {
         title: "Optimization Diagnosis",
         leadContacto: "Low Lead → Contact conversion: Check lead quality, acquisition channels or database.",
         contactoReunion: "Low Contact → Meeting conversion: Problem with initial pitch or target audience.",
+        reunionAsistencia: "Low Attendance Rate (Show Rate): Improve your confirmation and reminder workflow (email/WhatsApp).",
         reunionOportunidad: "Low Meeting → Opportunity: You're talking to people without BANT (Budget, Authority, Need, Timing).",
         oportunidadCierre: "Low Opportunity → Close: Price, competition, or urgency issues.",
       },
@@ -309,6 +337,7 @@ const SalesCalculator = () => {
       ticketPromedio,
       leadContacto,
       contactoReunion,
+      reunionAsistencia,
       reunionOportunidad,
       oportunidadCierre,
     } = inputs;
@@ -316,6 +345,7 @@ const SalesCalculator = () => {
     if (
       oportunidadCierre <= 0 ||
       reunionOportunidad <= 0 ||
+      reunionAsistencia <= 0 ||
       contactoReunion <= 0 ||
       leadContacto <= 0
     ) {
@@ -323,6 +353,7 @@ const SalesCalculator = () => {
         cierres: 0,
         oportunidades: 0,
         reuniones: 0,
+        reunionesAgendadas: 0,
         leads: 0,
         ingresos: 0,
         conversionTotal: 0,
@@ -332,10 +363,10 @@ const SalesCalculator = () => {
 
     // Cálculo inverso desde cierres hasta leads
     const oportunidades = Math.ceil(metaCierres / (oportunidadCierre / 100));
-    const reuniones = Math.ceil(oportunidades / (reunionOportunidad / 100));
-    // Consolidamos Lead a Contacto y Contacto a Reunión
+    const reuniones = Math.ceil(oportunidades / (reunionOportunidad / 100)); // Reuniones Realizadas (attended)
+    const reunionesAgendadas = Math.ceil(reuniones / (reunionAsistencia / 100)); // Reuniones Agendadas (scheduled)
     const leadReunionRate = (leadContacto / 100) * (contactoReunion / 100);
-    const leads = Math.ceil(reuniones / leadReunionRate);
+    const leads = Math.ceil(reunionesAgendadas / leadReunionRate);
     const ingresos = metaCierres * ticketPromedio;
     const conversionTotal = leads > 0 ? (metaCierres / leads) * 100 : 0;
 
@@ -343,6 +374,7 @@ const SalesCalculator = () => {
       cierres: metaCierres,
       oportunidades,
       reuniones,
+      reunionesAgendadas,
       leads,
       ingresos,
       conversionTotal: isNaN(conversionTotal) ? 0 : conversionTotal,
@@ -376,6 +408,9 @@ const SalesCalculator = () => {
     }
     if (inputs.contactoReunion < benchmarks.contactoReunion.min) {
       warnings.push(text.optimizationTips.contactoReunion);
+    }
+    if (inputs.reunionAsistencia < benchmarks.reunionAsistencia.min) {
+      warnings.push(text.optimizationTips.reunionAsistencia);
     }
     if (inputs.reunionOportunidad < benchmarks.reunionOportunidad.min) {
       warnings.push(text.optimizationTips.reunionOportunidad);
@@ -577,6 +612,43 @@ const SalesCalculator = () => {
                   </div>
                 </div>
 
+                {/* Tasa de Asistencia (Show Rate) */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm text-muted-foreground">
+                      {text.reunionAsistencia}
+                    </Label>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="w-3 h-3 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>{text.tooltips.reunionAsistencia}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {text.benchmark}: {benchmarks.reunionAsistencia.min}-{benchmarks.reunionAsistencia.max}%
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      value={inputs.reunionAsistencia}
+                      onChange={(e) => handleInputChange("reunionAsistencia", e.target.value)}
+                      className={`bg-secondary/50 border-border pr-16 ${
+                        getBenchmarkStatus("reunionAsistencia", inputs.reunionAsistencia) === "low"
+                          ? "border-destructive/50"
+                          : ""
+                      }`}
+                      min={0}
+                      max={100}
+                    />
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">
+                      {benchmarks.reunionAsistencia.min}-{benchmarks.reunionAsistencia.max}%
+                    </span>
+                  </div>
+                </div>
+
                 {/* Reunión → Oportunidad */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
@@ -670,8 +742,16 @@ const SalesCalculator = () => {
                     </p>
                   </div>
 
-                  {/* Reuniones Card */}
-                  <div className="glass-effect rounded-lg p-4 text-center border-l-4" style={{ borderColor: FUNNEL_COLORS.reuniones }}>
+                  {/* Reuniones Agendadas Card */}
+                  <div className="glass-effect rounded-lg p-4 text-center border-l-4" style={{ borderColor: FUNNEL_COLORS.reunionesAgendadas }}>
+                    <p className="text-xs text-muted-foreground mb-1">{text.reunionesAgendadas}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {results.reunionesAgendadas.toLocaleString()}
+                    </p>
+                  </div>
+
+                  {/* Reuniones Realizadas Card */}
+                  <div className="glass-effect rounded-lg p-4 text-center border-l-4" style={{ borderColor: FUNNEL_COLORS.reunionesRealizadas }}>
                     <p className="text-xs text-muted-foreground mb-1">{text.reuniones}</p>
                     <p className="text-2xl font-bold text-foreground">
                       {results.reuniones.toLocaleString()}
@@ -717,16 +797,29 @@ const SalesCalculator = () => {
                     <span className="text-lg font-bold text-white">{results.leads.toLocaleString()}</span>
                   </div>
 
-                  {/* Reuniones Stage */}
+                  {/* Reuniones Agendadas Stage */}
                   <div 
                     className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
                     style={{ 
-                      backgroundColor: FUNNEL_COLORS.reuniones,
+                      backgroundColor: FUNNEL_COLORS.reunionesAgendadas,
+                      width: `${getFunnelWidth(results.reunionesAgendadas)}%`
+                    }}
+                  >
+                    <span className="text-sm font-medium text-white">{text.reunionesAgendadas}</span>
+                    <span className="text-xs text-white/80 mx-2">{conversionRates.leadReunion}%</span>
+                    <span className="text-lg font-bold text-white">{results.reunionesAgendadas.toLocaleString()}</span>
+                  </div>
+
+                  {/* Reuniones Realizadas Stage */}
+                  <div 
+                    className="rounded-md py-3 px-4 flex justify-between items-center transition-all duration-500 mx-auto"
+                    style={{ 
+                      backgroundColor: FUNNEL_COLORS.reunionesRealizadas,
                       width: `${getFunnelWidth(results.reuniones)}%`
                     }}
                   >
-                    <span className="text-sm font-medium text-white">{language === "es" ? "Reuniones" : "Meetings"}</span>
-                    <span className="text-xs text-white/80 mx-2">{conversionRates.leadReunion}%</span>
+                    <span className="text-sm font-medium text-white">{text.reuniones}</span>
+                    <span className="text-xs text-white/80 mx-2">{inputs.reunionAsistencia}%</span>
                     <span className="text-lg font-bold text-white">{results.reuniones.toLocaleString()}</span>
                   </div>
 
@@ -739,7 +832,7 @@ const SalesCalculator = () => {
                     }}
                   >
                     <span className="text-sm font-medium text-white">{language === "es" ? "Oportunidades" : "Opportunities"}</span>
-                    <span className="text-xs text-white/80 mx-2">{conversionRates.reunionOportunidad}%</span>
+                    <span className="text-xs text-white/80 mx-2">{inputs.reunionOportunidad}%</span>
                     <span className="text-lg font-bold text-white">{results.oportunidades.toLocaleString()}</span>
                   </div>
 
@@ -752,7 +845,7 @@ const SalesCalculator = () => {
                     }}
                   >
                     <span className="text-sm font-medium text-white">{language === "es" ? "Cierres" : "Closes"}</span>
-                    <span className="text-xs text-white/80 mx-2">{conversionRates.oportunidadCierre}%</span>
+                    <span className="text-xs text-white/80 mx-2">{inputs.oportunidadCierre}%</span>
                     <span className="text-lg font-bold text-white">{results.cierres}</span>
                   </div>
                 </div>
@@ -843,6 +936,56 @@ const SalesCalculator = () => {
                 </div>
               )}
             </div>
+
+            {/* Pacing Section */}
+            {timePeriod === "monthly" && (
+              <div className="glass-effect rounded-lg p-4 sm:p-5 border border-primary/20">
+                <h4 className="text-sm font-semibold text-foreground mb-1 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  {text.pacingTitle}
+                </h4>
+                <p className="text-xs text-muted-foreground mb-4">
+                  {text.pacingSubtitle}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  <div className="bg-secondary/20 rounded p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground mb-1">{text.pacingLeads}</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {Math.ceil(results.leads / 20).toLocaleString()}
+                      <span className="text-[10px] text-muted-foreground font-normal block">/día</span>
+                    </p>
+                  </div>
+                  <div className="bg-secondary/20 rounded p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground mb-1">{text.pacingMeetings}</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {(results.reunionesAgendadas / 4).toFixed(1)}
+                      <span className="text-[10px] text-muted-foreground font-normal block">/semana</span>
+                    </p>
+                  </div>
+                  <div className="bg-secondary/20 rounded p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground mb-1">{text.pacingAttended}</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {(results.reuniones / 4).toFixed(1)}
+                      <span className="text-[10px] text-muted-foreground font-normal block">/semana</span>
+                    </p>
+                  </div>
+                  <div className="bg-secondary/20 rounded p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground mb-1">{text.pacingOpps}</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {(results.oportunidades / 4).toFixed(1)}
+                      <span className="text-[10px] text-muted-foreground font-normal block">/semana</span>
+                    </p>
+                  </div>
+                  <div className="bg-secondary/20 rounded p-3 text-center">
+                    <p className="text-[10px] text-muted-foreground mb-1">{text.pacingCloses}</p>
+                    <p className="text-lg font-bold text-foreground">
+                      {(results.cierres / 4).toFixed(1)}
+                      <span className="text-[10px] text-muted-foreground font-normal block">/semana</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* KPI Section */}
             <div className="glass-effect rounded-lg p-4">

@@ -73,6 +73,30 @@ const EmailFunnelCalculator = () => {
     };
   }, [emailsEnviados, emailsAbiertos, emailsRespondidos, reuniones]);
 
+  const [targetMeetings, setTargetMeetings] = useState(5);
+
+  const businessDays = useMemo(() => {
+    if (timePeriod === 'monthly') return 20;
+    if (timePeriod === 'weekly') return 5;
+    return 1;
+  }, [timePeriod]);
+
+  const simulatedMetrics = useMemo(() => {
+    const rAbiertos = tasas.abiertos > 0 ? tasas.abiertos / 100 : benchmarks.abiertosEnviados.avg / 100;
+    const rRespondidos = tasas.respondidos > 0 ? tasas.respondidos / 100 : benchmarks.respondidosAbiertos.avg / 100;
+    const rReuniones = tasas.reuniones > 0 ? tasas.reuniones / 100 : benchmarks.reunionesRespondidos.avg / 100;
+
+    const respondidos = targetMeetings / rReuniones;
+    const abiertos = respondidos / rRespondidos;
+    const enviados = abiertos / rAbiertos;
+
+    return {
+      enviados: isNaN(enviados) || !isFinite(enviados) ? 0 : enviados,
+      abiertos: isNaN(abiertos) || !isFinite(abiertos) ? 0 : abiertos,
+      respondidos: isNaN(respondidos) || !isFinite(respondidos) ? 0 : respondidos,
+    };
+  }, [targetMeetings, tasas]);
+
   const getFunnelWidth = (value: number) => {
     if (emailsEnviados === 0) return "100%";
     const percentage = Math.max((value / emailsEnviados) * 100, 15);
@@ -346,6 +370,54 @@ const EmailFunnelCalculator = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">{t.conversionTotal}</span>
                     <span className="text-2xl font-bold text-primary">{tasas.total.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Simulador de Metas */}
+            <div className="space-y-4 bg-card p-6 rounded-xl border border-border shadow-sm mt-6">
+              <h3 className="font-semibold text-lg border-b border-border pb-2 flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                {language === "es" ? "Simulador de Actividad (Planificación)" : "Activity Simulator (Planning)"}
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="targetMeetings" className="text-sm font-medium">
+                    {language === "es" ? "Meta de reuniones a lograr" : "Meeting goal to achieve"}
+                  </Label>
+                  <Input
+                    id="targetMeetings"
+                    type="number"
+                    min="1"
+                    value={targetMeetings}
+                    onChange={(e) => setTargetMeetings(Number(e.target.value))}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    {language === "es" 
+                      ? `Calculado usando tus tasas de conversión actuales (o benchmarks si no hay datos) y asumiendo ${timePeriod === 'monthly' ? '20' : timePeriod === 'weekly' ? '5' : '1'} días hábiles para el período ${timePeriodLabels[language][timePeriod].toLowerCase()}:`
+                      : `Calculated using your current conversion rates (or benchmarks if no data) and assuming ${timePeriod === 'monthly' ? '20' : timePeriod === 'weekly' ? '5' : '1'} business days for the ${timePeriodLabels[language][timePeriod].toLowerCase()} period:`
+                    }
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-background/80 rounded p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground mb-1">{language === "es" ? "Enviados" : "Sent"}</p>
+                      <p className="text-sm font-bold text-foreground">{Math.ceil(simulatedMetrics.enviados)}</p>
+                      <span className="text-[9px] text-muted-foreground font-normal block">({(simulatedMetrics.enviados / businessDays).toFixed(1)}/día)</span>
+                    </div>
+                    <div className="bg-background/80 rounded p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground mb-1">{language === "es" ? "Abiertos" : "Opened"}</p>
+                      <p className="text-sm font-bold text-foreground">{Math.ceil(simulatedMetrics.abiertos)}</p>
+                      <span className="text-[9px] text-muted-foreground font-normal block">({(simulatedMetrics.abiertos / businessDays).toFixed(1)}/día)</span>
+                    </div>
+                    <div className="bg-background/80 rounded p-2 text-center">
+                      <p className="text-[10px] text-muted-foreground mb-1">{language === "es" ? "Respondidos" : "Replied"}</p>
+                      <p className="text-sm font-bold text-foreground">{Math.ceil(simulatedMetrics.respondidos)}</p>
+                      <span className="text-[9px] text-muted-foreground font-normal block">({(simulatedMetrics.respondidos / businessDays).toFixed(1)}/día)</span>
+                    </div>
                   </div>
                 </div>
               </div>
