@@ -1,73 +1,44 @@
-# Welcome to your Lovable project
+# Sales Enablement & Marketing Toolbox ⚙️🧰
 
-## Project info
+<p align="center">
+  <a href="#-english">🇺🇸 English</a> | 
+  <a href="#-español">🇪🇸 Español</a>
+</p>
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## 🇺🇸 English
 
-There are several ways of editing your application.
+### What is the Treasurebox?
+The Sales Enablement Toolbox is a curated hub of productivity calculators, tracking mechanisms, and strategic resources designed for modern B2B sales professionals. It is engineered to help sales directors and account managers optimize daily call funnels, email sequences, and time allocation.
 
-**Use Lovable**
+### Core Features
+* **Rejection Tracker / NO → YES Counter (`NoCounter.tsx`):** A gamified counter that tracks received "NOs" as milestones towards converting them into "YESs", reinforcing sales resilience.
+* **Funnel Calculators (`SalesCalculator.tsx` / `CallFunnelCalculator.tsx` / `EmailFunnelCalculator.tsx` / `ProspectFunnelCalculator.tsx`):** Compact, interactive mathematical models to forecast pipeline volume, conversion rates, and revenue.
+* **Time Blocking Strategy (`TimeBlockingStrategy.tsx`):** Visual guides and tools to implement efficient daily schedule blocking.
+* **AI Agents Hub (`AIAgentsSection.tsx`):** A dedicated area highlighting automated prompt flows, system instructions, and agents.
+* **Bilingual Support (`LanguageContext`):** Seamless real-time switching between English and Spanish.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### Tech Stack
+* **Framework:** React + Vite (TypeScript)
+* **Styling:** Tailwind CSS, shadcn-ui
+* **Build System:** Bun / npm
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🇪🇸 Español
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### ¿Qué es la "Caja de Tesoros" (Treasurebox)?
+Esta es una colección curada de calculadoras de productividad, mecanismos de seguimiento y recursos estratégicos diseñados para profesionales de ventas B2B. Está estructurada para ayudar a directores de ventas y ejecutivos de cuenta a optimizar sus embudos de llamadas diarias, secuencias de correo electrónico y distribución de tiempo.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Características Clave
+* **Rastreador de Rechazos / Contador de NO → SÍ (`NoCounter.tsx`):** Un contador gamificado que registra los "NOs" recibidos como hitos intermedios para convertirlos en un "SÍ", reforzando la resiliencia comercial.
+* **Calculadoras de Embudo (`SalesCalculator.tsx` / `CallFunnelCalculator.tsx` / `EmailFunnelCalculator.tsx` / `ProspectFunnelCalculator.tsx`):** Modelos matemáticos interactivos y compactos para proyectar volumen de pipeline, tasas de conversión e ingresos esperados.
+* **Estrategia de Time Blocking (`TimeBlockingStrategy.tsx`):** Guías visuales y herramientas para implementar bloqueos de tiempo diarios altamente productivos.
+* **Catálogo de Agentes de IA (`AIAgentsSection.tsx`):** Una sección dedicada que destaca flujos de prompts automáticos, instrucciones de sistema y agentes.
+* **Soporte Bilingüe (`LanguageContext`):** Cambio dinámico y en tiempo real entre inglés y español en toda la interfaz.
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Stack Tecnológico
+* **Framework:** React + Vite (TypeScript)
+* **Estilos:** Tailwind CSS, shadcn-ui
+* **Gestión de paquetes:** Bun / npm
